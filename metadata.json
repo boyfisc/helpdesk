@@ -1,0 +1,6 @@
+{
+  "name": "SENTAX — Support Technique DGID",
+  "description": "SaaS de gestion des tickets de support technique et d'incidents de la Direction Générale des Impôts et des Domaines (DGID / SENTAX).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

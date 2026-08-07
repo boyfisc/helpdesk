@@ -1,0 +1,380 @@
+import React, { useState } from 'react';
+import { Shield, LogIn, LogOut, Mail, Search, Settings, Bell, Plus, FileText, AlertCircle, LayoutDashboard, CheckCircle2, UserCheck, Clock } from 'lucide-react';
+import { UserAgent } from '../types';
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  time: string;
+  isRead: boolean;
+  type: 'ticket' | 'transfer' | 'resolve' | 'alert';
+  ticketNumber?: string;
+}
+
+interface NavbarProps {
+  currentView: string;
+  setCurrentView: (view: string) => void;
+  user: UserAgent | null;
+  onOpenLogin: () => void;
+  onLogout: () => void;
+  onOpenEmailHub: () => void;
+  onOpenTrackModal: () => void;
+  onQuickSelectAgent: (agent: UserAgent) => void;
+  allAgents: UserAgent[];
+  onSelectNotificationTicket?: (ticketNumber?: string) => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({
+  currentView,
+  setCurrentView,
+  user,
+  onOpenLogin,
+  onLogout,
+  onOpenEmailHub,
+  onOpenTrackModal,
+  onQuickSelectAgent,
+  allAgents,
+  onSelectNotificationTicket,
+}) => {
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([
+    {
+      id: '1',
+      title: 'Nouveau ticket #ST-2026-000121',
+      message: 'Soumis par le Centre de Dakar Plateau (Blocage SENTAX)',
+      time: 'Il y a 5 min',
+      isRead: false,
+      type: 'ticket',
+      ticketNumber: 'ST-2026-000121',
+    },
+    {
+      id: '2',
+      title: 'Ticket transféré #ST-2026-000123',
+      message: 'Attribué à M. Ousmane Ndiaye (Chef de Bureau DSI)',
+      time: 'Il y a 25 min',
+      isRead: false,
+      type: 'transfer',
+      ticketNumber: 'ST-2026-000123',
+    },
+    {
+      id: '3',
+      title: 'Alerte SLA Temps Réponse',
+      message: '3 tickets en attente de prise en charge depuis 24h',
+      time: 'Il y a 1h',
+      isRead: false,
+      type: 'alert',
+      ticketNumber: 'ST-2026-000121',
+    },
+    {
+      id: '4',
+      title: 'Ticket résolu #ST-2026-000122',
+      message: 'Réinitialisation mot de passe SEN-ETAFI effectuée',
+      time: 'Il y a 2h',
+      isRead: true,
+      type: 'resolve',
+      ticketNumber: 'ST-2026-000122',
+    },
+  ]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleMarkAsRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  };
+
+  const getNotifIcon = (type: NotificationItem['type']) => {
+    switch (type) {
+      case 'ticket':
+        return <AlertCircle className="w-4 h-4 text-rose-500" />;
+      case 'transfer':
+        return <UserCheck className="w-4 h-4 text-sky-500" />;
+      case 'resolve':
+        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+      case 'alert':
+        return <Clock className="w-4 h-4 text-amber-500" />;
+      default:
+        return <Bell className="w-4 h-4 text-slate-500" />;
+    }
+  };
+  return (
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+      {/* Top Banner with DGID Identity */}
+      <div className="bg-[#f8fafc] text-slate-600 text-[11px] px-6 py-1 flex items-center justify-between border-b border-slate-200/80">
+        <div className="flex items-center space-x-2 font-medium">
+          <span className="font-extrabold text-emerald-700 uppercase tracking-wider">RÉPUBLIQUE DU SÉNÉGAL</span>
+          <span>•</span>
+          <span className="hidden sm:inline text-slate-500">Ministère des Finances et du Budget</span>
+          <span className="hidden sm:inline">•</span>
+          <span className="font-bold text-slate-800">DGID / SENTAX</span>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={onOpenEmailHub}
+            className="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all border border-emerald-200"
+            title="Consulter le journal des emails envoyés par le système"
+          >
+            <Mail className="w-3 h-3 text-emerald-600" />
+            <span>Journal Mail</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Header Bar */}
+      <div className="px-6 py-3 flex items-center justify-between">
+        {/* Left Brand Title */}
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('public-home')}>
+          <div className="w-9 h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-lg shadow-sm">
+            <div className="w-4 h-4 border-2 border-yellow-400 rounded-sm bg-emerald-800 transform rotate-45 flex items-center justify-center">
+              <span className="text-[9px] text-yellow-300 font-bold">N</span>
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xl font-extrabold tracking-tight text-[#0f172a]">Helpdesk</span>
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-emerald-200">
+                DGID SENTAX
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Center / Navigation Links */}
+        <div className="hidden lg:flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentView('public-home')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              currentView === 'public-home'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            Accueil Portail
+          </button>
+
+          <button
+            onClick={() => setCurrentView('create-incident')}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 flex items-center space-x-1.5 transition-all"
+          >
+            <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+            <span>Incident</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('create-request')}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 flex items-center space-x-1.5 transition-all"
+          >
+            <FileText className="w-3.5 h-3.5 text-sky-600" />
+            <span>Requête</span>
+          </button>
+
+          <button
+            onClick={onOpenTrackModal}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center space-x-1.5 transition-all"
+          >
+            <Search className="w-3.5 h-3.5 text-slate-500" />
+            <span>Suivi Ticket</span>
+          </button>
+
+          {user && (
+            <button
+              onClick={() => setCurrentView('backoffice')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all ${
+                currentView === 'backoffice'
+                  ? 'bg-[#008738] text-white shadow-sm'
+                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>Espace Backoffice</span>
+            </button>
+          )}
+        </div>
+
+        {/* Right Header Toolbar matching screenshot (Search, Gear, Bell Badge, User Profile) */}
+        <div className="flex items-center space-x-3">
+          {/* Quick Action Icons matching screenshot */}
+          <button
+            onClick={onOpenTrackModal}
+            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+            title="Recherche de tickets"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={onOpenEmailHub}
+            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+            title="Paramètres & Hub Mail"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+
+          <div className="relative">
+            <button
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+              title="Centre de notifications"
+            >
+              <Bell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-emerald-600 text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full border-2 border-white shadow-xs">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notifications Popover Dropdown */}
+            {isNotificationsOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsNotificationsOpen(false)}
+                ></div>
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  {/* Header */}
+                  <div className="bg-[#f8fafc] px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Bell className="w-4 h-4 text-emerald-700" />
+                      <span className="font-extrabold text-sm text-slate-900">Notifications DSI</span>
+                      {unreadCount > 0 && (
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          {unreadCount} nouvelle{unreadCount > 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllAsRead}
+                        className="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold hover:underline"
+                      >
+                        Tout marquer comme lu
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Notification List */}
+                  <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-slate-400 text-xs">
+                        Aucune notification pour le moment.
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          onClick={() => {
+                            handleMarkAsRead(notif.id);
+                            if (onSelectNotificationTicket) {
+                              onSelectNotificationTicket(notif.ticketNumber);
+                            } else {
+                              setCurrentView('backoffice');
+                            }
+                            setIsNotificationsOpen(false);
+                          }}
+                          className={`p-3.5 hover:bg-emerald-50/40 transition-colors cursor-pointer flex items-start space-x-3 ${
+                            !notif.isRead ? 'bg-emerald-50/20' : ''
+                          }`}
+                        >
+                          <div className="shrink-0 mt-0.5">{getNotifIcon(notif.type)}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className={`text-xs ${!notif.isRead ? 'font-extrabold text-slate-900' : 'font-semibold text-slate-700'}`}>
+                                {notif.title}
+                              </span>
+                              {!notif.isRead && (
+                                <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0 ml-2"></span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-600 leading-snug line-clamp-2">
+                              {notif.message}
+                            </p>
+                            <span className="text-[10px] text-slate-400 font-medium block mt-1">
+                              {notif.time}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-200 text-center">
+                    <button
+                      onClick={() => {
+                        setCurrentView('backoffice');
+                        setIsNotificationsOpen(false);
+                      }}
+                      className="text-xs font-bold text-[#008738] hover:text-emerald-800 transition-colors"
+                    >
+                      Voir tout dans l'Espace Backoffice →
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="h-6 border-r border-slate-200 mx-1 hidden sm:block"></div>
+
+          {/* User Account / Profile */}
+          {user ? (
+            <div className="flex items-center space-x-2.5 bg-slate-50 hover:bg-slate-100 p-1.5 pr-2.5 rounded-full border border-slate-200 transition-all">
+              <div className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center overflow-hidden border border-slate-300">
+                {user.firstName[0]}
+                {user.lastName[0]}
+              </div>
+              <div className="hidden sm:flex flex-col text-left text-xs">
+                <span className="font-bold text-slate-900 leading-tight">
+                  {user.email || `${user.firstName.toLowerCase()}@dgid.sn`}
+                </span>
+                <span className="text-[10px] text-slate-500 leading-tight truncate max-w-[140px]">
+                  Agent Support • {user.role}
+                </span>
+              </div>
+
+              {/* Agent Quick Selector */}
+              <select
+                value={user.id}
+                onChange={(e) => {
+                  const selected = allAgents.find((a) => a.id === e.target.value);
+                  if (selected) onQuickSelectAgent(selected);
+                }}
+                className="bg-white text-[11px] font-medium text-slate-700 border border-slate-200 rounded-md px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 ml-1 cursor-pointer"
+                title="Sélecteur d'Agent Démo"
+              >
+                {allAgents.map((ag) => (
+                  <option key={ag.id} value={ag.id}>
+                    {ag.firstName} {ag.lastName}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={onLogout}
+                className="p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-200 rounded-full transition-colors ml-1"
+                title="Se déconnecter"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenLogin}
+              className="bg-[#008738] hover:bg-[#007530] text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-2 shadow-xs transition-all active:scale-98"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Connexion Agent</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
