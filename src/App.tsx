@@ -21,6 +21,7 @@ import { PublicTicket, Ticket, TicketObjectType, UserAgent } from './types';
 export default function App() {
   const [currentView, setCurrentView] = useState<'public-home' | 'backoffice'>('public-home');
   const [backofficeTab, setBackofficeTab] = useState<string>('dashboard');
+  const [backofficeStatusFilter, setBackofficeStatusFilter] = useState<string>('ALL');
 
   // Modals state
   const [isCreateTicketOpen, setIsCreateTicketOpen] = useState(false);
@@ -250,7 +251,10 @@ export default function App() {
           }}
           user={currentUser}
           onOpenLogin={() => setIsLoginModalOpen(true)}
-          onLogout={() => setCurrentUser(null)}
+          onLogout={() => {
+            setCurrentUser(null);
+            setCurrentView('public-home');
+          }}
           onOpenEmailHub={() => setIsEmailHubOpen(true)}
           onOpenTrackModal={() => handleOpenTrackModal()}
           onQuickSelectAgent={(ag) => setCurrentUser(ag)}
@@ -267,6 +271,8 @@ export default function App() {
               onOpenTrackTicket={handleOpenTrackModal}
               onRefreshPublicTickets={fetchPublicTickets}
               loading={loading}
+              user={currentUser}
+              onOpenTicketDetail={handleSelectNotificationTicket}
             />
           </main>
         ) : (
@@ -277,6 +283,8 @@ export default function App() {
               user={currentUser}
               onOpenEmailHub={() => setIsEmailHubOpen(true)}
               onOpenCreateTicket={handleOpenCreateTicket}
+              statusFilter={backofficeStatusFilter}
+              setStatusFilter={setBackofficeStatusFilter}
             >
               {backofficeTab === 'dashboard' && (
                 <DashboardView
@@ -286,6 +294,10 @@ export default function App() {
                   onOpenTicketDetails={(t) => setSelectedTicketForDrawer(t)}
                   onOpenTransferModal={(t) => setSelectedTicketForTransfer(t)}
                   onOpenResolveModal={(t) => setSelectedTicketForResolve(t)}
+                  onNavigateToFilter={(filter) => {
+                    setBackofficeStatusFilter(filter);
+                    setBackofficeTab('tickets');
+                  }}
                 />
               )}
 
@@ -298,6 +310,7 @@ export default function App() {
                   onOpenResolveModal={(t) => setSelectedTicketForResolve(t)}
                   onOpenTicketDetails={(t) => setSelectedTicketForDrawer(t)}
                   allAgents={allAgents}
+                  forcedStatus={backofficeStatusFilter}
                 />
               )}
 
@@ -310,6 +323,7 @@ export default function App() {
                   onOpenResolveModal={(t) => setSelectedTicketForResolve(t)}
                   onOpenTicketDetails={(t) => setSelectedTicketForDrawer(t)}
                   allAgents={allAgents}
+                  forcedStatus={backofficeStatusFilter}
                 />
               )}
 

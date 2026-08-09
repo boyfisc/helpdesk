@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertCircle, FileText, Search, Filter, ShieldCheck, Clock, CheckCircle2, RefreshCw } from 'lucide-react';
 import { PLATFORMS, TAX_CENTERS } from '../constants';
-import { PublicTicket, TicketObjectType } from '../types';
+import { PublicTicket, TicketObjectType, UserAgent } from '../types';
 
 interface PublicHomeProps {
   publicTickets: PublicTicket[];
@@ -9,6 +9,8 @@ interface PublicHomeProps {
   onOpenTrackTicket: (ticketNum?: string) => void;
   onRefreshPublicTickets: () => void;
   loading: boolean;
+  user?: UserAgent | null;
+  onOpenTicketDetail?: (ticketNum?: string) => void;
 }
 
 export const PublicHome: React.FC<PublicHomeProps> = ({
@@ -17,6 +19,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   onOpenTrackTicket,
   onRefreshPublicTickets,
   loading,
+  user,
+  onOpenTicketDetail,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -38,33 +42,34 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   });
 
   const getStatusBadge = (status: string) => {
+    const baseClass = "text-[11px] px-2.5 py-0.5 rounded-full font-bold truncate max-w-full inline-block align-middle";
     switch (status) {
       case 'EN ATTENTE':
         return (
-          <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[11px] px-2.5 py-0.5 rounded-full font-bold">
+          <span className={`bg-amber-100 text-amber-800 border border-amber-300 ${baseClass}`} title="En attente">
             🟡 En attente
           </span>
         );
       case 'PRISE EN CHARGE':
         return (
-          <span className="bg-sky-100 text-sky-800 border border-sky-300 text-[11px] px-2.5 py-0.5 rounded-full font-bold">
+          <span className={`bg-sky-100 text-sky-800 border border-sky-300 ${baseClass}`} title="Prise en charge">
             🔵 Prise en charge
           </span>
         );
       case 'TRANSFÉRÉ':
         return (
-          <span className="bg-orange-100 text-orange-800 border border-orange-300 text-[11px] px-2.5 py-0.5 rounded-full font-bold">
+          <span className={`bg-orange-100 text-orange-800 border border-orange-300 ${baseClass}`} title="Transféré">
             🟠 Transféré
           </span>
         );
       case 'TERMINÉ':
         return (
-          <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] px-2.5 py-0.5 rounded-full font-bold">
+          <span className={`bg-emerald-100 text-emerald-800 border border-emerald-300 ${baseClass}`} title="Terminé">
             🟢 Terminé
           </span>
         );
       default:
-        return <span className="bg-slate-100 text-slate-800 text-[11px] px-2.5 py-0.5 rounded-full">{status}</span>;
+        return <span className={`bg-slate-100 text-slate-800 border border-slate-200 ${baseClass}`} title={status}>{status}</span>;
     }
   };
 
@@ -206,14 +211,20 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     <td className="px-4 py-3 font-mono text-slate-500 text-[11px]">
                       {new Date(t.createdAt).toLocaleDateString('fr-FR')}
                     </td>
-                    <td className="px-4 py-3">{getStatusBadge(t.status)}</td>
+                    <td className="px-4 py-3 max-w-[120px]">{getStatusBadge(t.status)}</td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => onOpenTrackTicket(t.ticketNumber)}
-                        className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline"
-                      >
-                        Suivre
-                      </button>
+                      {user && (
+                        <button
+                          onClick={() => {
+                            if (onOpenTicketDetail) {
+                              onOpenTicketDetail(t.ticketNumber);
+                            }
+                          }}
+                          className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline text-[11px]"
+                        >
+                          Suivre
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

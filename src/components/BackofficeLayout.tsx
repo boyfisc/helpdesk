@@ -23,6 +23,8 @@ interface BackofficeLayoutProps {
   user: UserAgent;
   onOpenEmailHub: () => void;
   onOpenCreateTicket?: (type: any) => void;
+  statusFilter: string;
+  setStatusFilter: (filter: string) => void;
   children: React.ReactNode;
 }
 
@@ -32,6 +34,8 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
   user,
   onOpenEmailHub,
   onOpenCreateTicket,
+  statusFilter,
+  setStatusFilter,
   children,
 }) => {
   const isSuperadmin = user.role === 'SUPERADMIN';
@@ -151,47 +155,47 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
           {/* Status Tabs with count badges */}
           <div className="flex items-center space-x-2 sm:space-x-6 text-xs overflow-x-auto">
             <button
-              onClick={() => setCurrentTab('tickets')}
+              onClick={() => { setCurrentTab('tickets'); setStatusFilter('ALL'); }}
               className={`pb-1 font-bold flex items-center space-x-2 transition-all border-b-2 ${
-                currentTab === 'tickets' || currentTab === 'dashboard'
+                currentTab === 'tickets' && statusFilter === 'ALL'
                   ? 'border-[#008738] text-slate-900'
                   : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
               <span>Toutes les demandes</span>
-              <span className="bg-emerald-100 text-emerald-800 font-extrabold text-[10px] px-2 py-0.5 rounded-full">
-                44
-              </span>
             </button>
 
             <button
-              onClick={() => setCurrentTab('tickets')}
-              className="pb-1 font-semibold flex items-center space-x-2 text-slate-600 hover:text-slate-900 transition-all border-b-2 border-transparent"
+              onClick={() => { setCurrentTab('tickets'); setStatusFilter('ACTIFS'); }}
+              className={`pb-1 font-semibold flex items-center space-x-2 transition-all border-b-2 ${
+                currentTab === 'tickets' && statusFilter === 'ACTIFS'
+                  ? 'border-[#008738] text-slate-900'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
             >
               <span>Actifs</span>
-              <span className="bg-emerald-100 text-emerald-800 font-extrabold text-[10px] px-2 py-0.5 rounded-full">
-                22
-              </span>
             </button>
 
             <button
-              onClick={() => setCurrentTab('tickets')}
-              className="pb-1 font-semibold flex items-center space-x-2 text-slate-600 hover:text-slate-900 transition-all border-b-2 border-transparent"
+              onClick={() => { setCurrentTab('tickets'); setStatusFilter('EN ATTENTE'); }}
+              className={`pb-1 font-semibold flex items-center space-x-2 transition-all border-b-2 ${
+                currentTab === 'tickets' && statusFilter === 'EN ATTENTE'
+                  ? 'border-[#008738] text-slate-900'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
             >
               <span>Urgents</span>
-              <span className="bg-rose-100 text-rose-800 font-extrabold text-[10px] px-2 py-0.5 rounded-full">
-                8
-              </span>
             </button>
 
             <button
-              onClick={() => setCurrentTab('tickets')}
-              className="pb-1 font-semibold flex items-center space-x-2 text-slate-600 hover:text-slate-900 transition-all border-b-2 border-transparent"
+              onClick={() => { setCurrentTab('tickets'); setStatusFilter('TERMINÉ'); }}
+              className={`pb-1 font-semibold flex items-center space-x-2 transition-all border-b-2 ${
+                currentTab === 'tickets' && statusFilter === 'TERMINÉ'
+                  ? 'border-[#008738] text-slate-900'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
             >
               <span>Fermés</span>
-              <span className="bg-slate-100 text-slate-700 font-extrabold text-[10px] px-2 py-0.5 rounded-full">
-                14
-              </span>
             </button>
           </div>
 

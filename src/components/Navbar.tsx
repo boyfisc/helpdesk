@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, LogIn, LogOut, Mail, Search, Settings, Bell, Plus, FileText, AlertCircle, LayoutDashboard, CheckCircle2, UserCheck, Clock } from 'lucide-react';
+import { Shield, LogIn, LogOut, Mail, Search, Settings, Bell, Plus, FileText, AlertCircle, LayoutDashboard, CheckCircle2, UserCheck, Clock, Menu, X } from 'lucide-react';
 import { UserAgent } from '../types';
 
 export interface NotificationItem {
@@ -38,6 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectNotificationTicket,
 }) => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: '1',
@@ -198,11 +199,20 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right Header Toolbar matching screenshot (Search, Gear, Bell Badge, User Profile) */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
+          {/* Nouveau Ticket Button */}
+          <button
+            onClick={() => setCurrentView('create-incident')}
+            className="bg-[#008738] hover:bg-[#007530] text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all active:scale-98 mr-1"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Nouveau ticket</span>
+          </button>
+
           {/* Quick Action Icons matching screenshot */}
           <button
             onClick={onOpenTrackModal}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
             title="Recherche de tickets"
           >
             <Search className="w-4 h-4" />
@@ -210,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenEmailHub}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
             title="Paramètres & Hub Mail"
           >
             <Settings className="w-4 h-4" />
@@ -219,12 +229,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative">
             <button
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
               title="Centre de notifications"
             >
               <Bell className="w-4 h-4" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-emerald-600 text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full border-2 border-white shadow-xs">
+                <span className="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white font-bold text-[9px] px-1 py-0 rounded-full border border-white shadow-xs">
                   {unreadCount}
                 </span>
               )}
@@ -321,21 +331,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          <div className="h-6 border-r border-slate-200 mx-1 hidden sm:block"></div>
+          <div className="h-5 border-r border-slate-200 mx-1 hidden sm:block"></div>
 
           {/* User Account / Profile */}
           {user ? (
-            <div className="flex items-center space-x-2.5 bg-slate-50 hover:bg-slate-100 p-1.5 pr-2.5 rounded-full border border-slate-200 transition-all">
-              <div className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center overflow-hidden border border-slate-300">
+            <div className="flex items-center space-x-1.5 bg-slate-50 hover:bg-slate-100 p-1 pr-1.5 rounded-full border border-slate-200 transition-all max-w-[240px]">
+              <div className="w-6 h-6 rounded-full bg-slate-800 text-white font-bold text-[10px] flex items-center justify-center overflow-hidden border border-slate-300 shrink-0">
                 {user.firstName[0]}
                 {user.lastName[0]}
               </div>
-              <div className="hidden sm:flex flex-col text-left text-xs">
-                <span className="font-bold text-slate-900 leading-tight">
-                  {user.email || `${user.firstName.toLowerCase()}@dgid.sn`}
+              <div className="hidden lg:flex flex-col text-left">
+                <span className="font-bold text-slate-900 text-[10px] leading-tight truncate max-w-[100px]">
+                  {user.firstName} {user.lastName}
                 </span>
-                <span className="text-[10px] text-slate-500 leading-tight truncate max-w-[140px]">
-                  Agent Support • {user.role}
+                <span className="text-[9px] text-slate-500 leading-tight truncate max-w-[100px]">
+                  {user.role}
                 </span>
               </div>
 
@@ -346,19 +356,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                   const selected = allAgents.find((a) => a.id === e.target.value);
                   if (selected) onQuickSelectAgent(selected);
                 }}
-                className="bg-white text-[11px] font-medium text-slate-700 border border-slate-200 rounded-md px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 ml-1 cursor-pointer"
+                className="bg-white text-[10px] font-medium text-slate-700 border border-slate-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 ml-1 cursor-pointer w-16 truncate hidden sm:block"
                 title="Sélecteur d'Agent Démo"
               >
                 {allAgents.map((ag) => (
                   <option key={ag.id} value={ag.id}>
-                    {ag.firstName} {ag.lastName}
+                    {ag.firstName}
                   </option>
                 ))}
               </select>
 
               <button
                 onClick={onLogout}
-                className="p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-200 rounded-full transition-colors ml-1"
+                className="p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-200 rounded-full transition-colors ml-0.5 shrink-0"
                 title="Se déconnecter"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -367,14 +377,87 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenLogin}
-              className="bg-[#008738] hover:bg-[#007530] text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-2 shadow-xs transition-all active:scale-98"
+              className="bg-[#008738] hover:bg-[#007530] text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-xs transition-all active:scale-98"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Connexion Agent</span>
+              <span>Connexion</span>
+            </button>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="lg:hidden p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors ml-1"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-slate-50 border-t border-slate-200 px-4 py-3 flex flex-col space-y-2">
+          <button
+            onClick={() => {
+              setCurrentView('public-home');
+              setIsMobileMenuOpen(false);
+            }}
+            className={`px-4 py-2.5 rounded-lg text-sm font-bold text-left transition-all ${
+              currentView === 'public-home'
+                ? 'bg-emerald-100 text-emerald-800'
+                : 'text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            Accueil Portail
+          </button>
+          <button
+            onClick={() => {
+              setCurrentView('create-incident');
+              setIsMobileMenuOpen(false);
+            }}
+            className="px-4 py-2.5 rounded-lg text-sm font-bold text-rose-700 hover:bg-rose-100 text-left flex items-center space-x-2"
+          >
+            <AlertCircle className="w-4 h-4" />
+            <span>Incident</span>
+          </button>
+          <button
+            onClick={() => {
+              setCurrentView('create-request');
+              setIsMobileMenuOpen(false);
+            }}
+            className="px-4 py-2.5 rounded-lg text-sm font-bold text-sky-700 hover:bg-sky-100 text-left flex items-center space-x-2"
+          >
+            <FileText className="w-4 h-4" />
+            <span>Requête</span>
+          </button>
+          <button
+            onClick={() => {
+              onOpenTrackModal();
+              setIsMobileMenuOpen(false);
+            }}
+            className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-200 text-left flex items-center space-x-2"
+          >
+            <Search className="w-4 h-4" />
+            <span>Suivi Ticket</span>
+          </button>
+          {user && (
+            <button
+              onClick={() => {
+                setCurrentView('backoffice');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`px-4 py-2.5 rounded-lg text-sm font-bold text-left flex items-center space-x-2 ${
+                currentView === 'backoffice'
+                  ? 'bg-[#008738] text-white'
+                  : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Espace Backoffice</span>
             </button>
           )}
         </div>
-      </div>
+      )}
     </header>
   );
 };

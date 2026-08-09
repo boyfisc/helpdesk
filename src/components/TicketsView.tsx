@@ -28,6 +28,7 @@ interface TicketsViewProps {
   onOpenResolveModal: (ticket: Ticket) => void;
   onOpenTicketDetails: (ticket: Ticket) => void;
   allAgents: UserAgent[];
+  forcedStatus?: string;
 }
 
 export const TicketsView: React.FC<TicketsViewProps> = ({
@@ -38,12 +39,19 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
   onOpenResolveModal,
   onOpenTicketDetails,
   allAgents,
+  forcedStatus,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [selectedPlatform, setSelectedPlatform] = useState('ALL');
   const [selectedCenter, setSelectedCenter] = useState('ALL');
   const [selectedAgent, setSelectedAgent] = useState('ALL');
+
+  React.useEffect(() => {
+    if (forcedStatus) {
+      setSelectedStatus(forcedStatus);
+    }
+  }, [forcedStatus]);
 
   const filteredTickets = tickets.filter((t) => {
     const matchesSearch =
@@ -53,7 +61,11 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
       t.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = selectedStatus === 'ALL' || t.status === selectedStatus;
+    const matchesStatus = 
+      selectedStatus === 'ALL' ? true : 
+      selectedStatus === 'ACTIFS' ? t.status !== 'TERMINÉ' : 
+      t.status === selectedStatus;
+
     const matchesPlatform = selectedPlatform === 'ALL' || t.platform === selectedPlatform;
     const matchesCenter = selectedCenter === 'ALL' || t.centreFiscal === selectedCenter;
     const matchesAgent =
@@ -64,39 +76,40 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
   });
 
   const getStatusBadge = (status: string) => {
+    const baseClass = "text-[11px] px-2.5 py-1 rounded-full font-bold inline-flex items-center space-x-1.5 truncate max-w-full align-middle";
     switch (status) {
       case 'EN ATTENTE':
         return (
-          <span className="bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] px-2.5 py-1 rounded-full font-bold inline-flex items-center space-x-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#137333]"></span>
-            <span>EN ATTENTE</span>
+          <span className={`bg-[#e6f4ea] text-[#137333] border border-[#ceead6] ${baseClass}`} title="EN ATTENTE">
+            <span className="w-2 h-2 rounded-full bg-[#137333] shrink-0"></span>
+            <span className="truncate">EN ATTENTE</span>
           </span>
         );
       case 'PRISE EN CHARGE':
         return (
-          <span className="bg-[#e8f0fe] text-[#1a73e8] border border-[#c2e7ff] text-[11px] px-2.5 py-1 rounded-full font-bold inline-flex items-center space-x-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#1a73e8]"></span>
-            <span>PRISE EN CHARGE</span>
+          <span className={`bg-[#e8f0fe] text-[#1a73e8] border border-[#c2e7ff] ${baseClass}`} title="PRISE EN CHARGE">
+            <span className="w-2 h-2 rounded-full bg-[#1a73e8] shrink-0"></span>
+            <span className="truncate">PRISE EN CHARGE</span>
           </span>
         );
       case 'TRANSFÉRÉ':
         return (
-          <span className="bg-[#fef7e0] text-[#b06000] border border-[#feefc3] text-[11px] px-2.5 py-1 rounded-full font-bold inline-flex items-center space-x-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#b06000]"></span>
-            <span>TRANSFÉRÉ</span>
+          <span className={`bg-[#fef7e0] text-[#b06000] border border-[#feefc3] ${baseClass}`} title="TRANSFÉRÉ">
+            <span className="w-2 h-2 rounded-full bg-[#b06000] shrink-0"></span>
+            <span className="truncate">TRANSFÉRÉ</span>
           </span>
         );
       case 'TERMINÉ':
         return (
-          <span className="bg-[#f1f3f4] text-[#5f6368] border border-[#dadce0] text-[11px] px-2.5 py-1 rounded-full font-bold inline-flex items-center space-x-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#5f6368]"></span>
-            <span>TERMINÉ / FERMÉ</span>
+          <span className={`bg-[#f1f3f4] text-[#5f6368] border border-[#dadce0] ${baseClass}`} title="TERMINÉ / FERMÉ">
+            <span className="w-2 h-2 rounded-full bg-[#5f6368] shrink-0"></span>
+            <span className="truncate">TERMINÉ / FERMÉ</span>
           </span>
         );
       default:
         return (
-          <span className="bg-slate-100 text-slate-800 text-[11px] px-2.5 py-1 rounded-full font-bold">
-            {status}
+          <span className={`bg-slate-100 text-slate-800 border border-slate-200 ${baseClass}`} title={status}>
+            <span className="truncate">{status}</span>
           </span>
         );
     }
@@ -140,6 +153,7 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
             >
               <option value="ALL">Tous les statuts</option>
+              <option value="ACTIFS">⚡ ACTIFS (Non terminés)</option>
               <option value="EN ATTENTE">🟡 EN ATTENTE</option>
               <option value="PRISE EN CHARGE">🔵 PRISE EN CHARGE</option>
               <option value="TRANSFÉRÉ">🟠 TRANSFÉRÉ</option>
@@ -240,7 +254,7 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
                       {t.centreFiscal}
                     </td>
 
-                    <td className="px-4 py-3.5">{getStatusBadge(t.status)}</td>
+                    <td className="px-4 py-3.5 max-w-[130px]">{getStatusBadge(t.status)}</td>
 
                     <td className="px-4 py-3.5">
                       {t.assignedAgentName ? (

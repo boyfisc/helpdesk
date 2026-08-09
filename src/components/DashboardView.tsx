@@ -21,6 +21,7 @@ interface DashboardViewProps {
   onOpenTicketDetails: (ticket: Ticket) => void;
   onOpenTransferModal: (ticket: Ticket) => void;
   onOpenResolveModal: (ticket: Ticket) => void;
+  onNavigateToFilter?: (filter: string) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -30,6 +31,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenTicketDetails,
   onOpenTransferModal,
   onOpenResolveModal,
+  onNavigateToFilter,
 }) => {
   const total = tickets.length;
   const enAttente = tickets.filter((t) => t.status === 'EN ATTENTE');
@@ -65,69 +67,90 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         <div className="flex items-center space-x-4 bg-slate-900/90 px-4 py-2.5 rounded-xl border border-slate-800 text-xs text-slate-300 shadow-inner">
-          <div>
+          <button 
+            onClick={() => onNavigateToFilter?.('ACTIFS')}
+            className="text-left hover:opacity-80 transition-opacity"
+          >
             <span className="block text-[10px] text-slate-400 uppercase font-bold tracking-wider">Mes Tickets Actifs</span>
             <span className="text-lg font-black text-emerald-400 font-mono">{myTickets.length}</span>
-          </div>
+          </button>
           <div className="h-8 border-r border-slate-800"></div>
-          <div>
+          <button
+            onClick={() => onNavigateToFilter?.('EN ATTENTE')}
+            className="text-left hover:opacity-80 transition-opacity"
+          >
             <span className="block text-[10px] text-slate-400 uppercase font-bold tracking-wider">Queue Globale</span>
             <span className="text-lg font-black text-amber-400 font-mono">{enAttente.length}</span>
-          </div>
+          </button>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-2 hover:shadow-md transition-shadow">
+        <button 
+          onClick={() => onNavigateToFilter?.('ALL')}
+          className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-2 hover:shadow-md transition-shadow text-left"
+        >
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Total Tickets</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-slate-900 font-mono">{total}</span>
             <TicketIcon className="w-5 h-5 text-slate-400" />
           </div>
           <span className="text-[11px] text-slate-500 block">Enregistrés ce mois</span>
-        </div>
+        </button>
 
         {/* En Attente */}
-        <div className="bg-white p-5 rounded-2xl border border-amber-200 shadow-sm space-y-2 hover:shadow-md transition-shadow">
+        <button
+          onClick={() => onNavigateToFilter?.('EN ATTENTE')}
+          className="bg-white p-5 rounded-2xl border border-amber-200 shadow-sm space-y-2 hover:shadow-md transition-shadow text-left"
+        >
           <span className="text-xs font-bold text-amber-700 uppercase tracking-wider block">🟡 En Attente</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-amber-900 font-mono">{enAttente.length}</span>
             <Clock className="w-5 h-5 text-amber-600" />
           </div>
           <span className="text-[11px] text-amber-700 block">À traiter d'urgence</span>
-        </div>
+        </button>
 
         {/* Prise en Charge */}
-        <div className="bg-white p-5 rounded-2xl border border-sky-200 shadow-sm space-y-2 hover:shadow-md transition-shadow">
+        <button
+          onClick={() => onNavigateToFilter?.('PRISE EN CHARGE')}
+          className="bg-white p-5 rounded-2xl border border-sky-200 shadow-sm space-y-2 hover:shadow-md transition-shadow text-left"
+        >
           <span className="text-xs font-bold text-sky-700 uppercase tracking-wider block">🔵 En Cours</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-sky-900 font-mono">{enPriseEnCharge.length}</span>
             <TrendingUp className="w-5 h-5 text-sky-600" />
           </div>
           <span className="text-[11px] text-sky-700 block">Sous traitement agent</span>
-        </div>
+        </button>
 
         {/* Transférés */}
-        <div className="bg-white p-5 rounded-2xl border border-orange-200 shadow-sm space-y-2 hover:shadow-md transition-shadow">
+        <button
+          onClick={() => onNavigateToFilter?.('TRANSFÉRÉ')}
+          className="bg-white p-5 rounded-2xl border border-orange-200 shadow-sm space-y-2 hover:shadow-md transition-shadow text-left"
+        >
           <span className="text-xs font-bold text-orange-700 uppercase tracking-wider block">🟠 Transférés</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-orange-900 font-mono">{transferes.length}</span>
             <Send className="w-5 h-5 text-orange-600" />
           </div>
           <span className="text-[11px] text-orange-700 block">Ré-attribués</span>
-        </div>
+        </button>
 
         {/* Terminés */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm space-y-2 hover:shadow-md transition-shadow">
+        <button
+          onClick={() => onNavigateToFilter?.('TERMINÉ')}
+          className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm space-y-2 hover:shadow-md transition-shadow text-left"
+        >
           <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider block">🟢 Terminés</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-emerald-900 font-mono">{termines.length}</span>
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
           <span className="text-[11px] text-emerald-700 block">Tickets clôturés</span>
-        </div>
+        </button>
       </div>
 
       {/* Main Grid: Priority Queue & Stats */}
