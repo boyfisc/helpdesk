@@ -45,11 +45,6 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
     <div className="flex flex-col md:flex-row min-h-[calc(100vh-5rem)] bg-[#f8fafc] relative">
       {/* Left Vibrant Green Sidebar matching screenshot */}
       <aside className="w-full md:w-16 lg:w-16 bg-[#008738] text-white shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start py-4 px-2 space-y-0 md:space-y-6 shadow-md z-30">
-        {/* Top App Icon */}
-        <div className="w-auto px-2 h-10 rounded-xl bg-emerald-900/60 border border-emerald-400/30 flex items-center justify-center text-white font-black text-sm shadow-inner tracking-wider">
-          DGID
-        </div>
-
         {/* Sidebar Nav Icons matching screenshot */}
         <nav className="flex flex-row md:flex-col items-center space-x-2 md:space-x-0 md:space-y-3 w-full">
           {/* Dashboard / Accueil */}
@@ -84,7 +79,7 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
               }`}
               title="Tous les tickets"
             >
-              <Mail className="w-5 h-5" />
+              <Users className="w-5 h-5" />
             </button>
           </div>
 

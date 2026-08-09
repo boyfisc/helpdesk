@@ -87,6 +87,7 @@ export default function App() {
       if (data.length > 0 && !currentUser) {
         // Default connected agent for quick demo
         setCurrentUser(data[0]);
+        setCurrentView('backoffice');
       }
     } catch (e) {
       console.error('Error fetching agents:', e);

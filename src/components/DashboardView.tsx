@@ -219,7 +219,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Platform Breakdown Side Widget */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-md p-6 space-y-4">
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-md p-6 space-y-4 self-start sticky top-6">
           <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-3">
             <BarChart3 className="w-5 h-5 text-emerald-600" />
             <span>Tickets par Plateforme</span>

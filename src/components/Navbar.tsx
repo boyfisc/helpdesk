@@ -112,9 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center space-x-2 font-medium">
           <span className="font-extrabold text-emerald-700 uppercase tracking-wider">RÉPUBLIQUE DU SÉNÉGAL</span>
           <span>•</span>
-          <span className="hidden sm:inline text-slate-500">Ministère des Finances et du Budget</span>
-          <span className="hidden sm:inline">•</span>
-          <span className="font-bold text-slate-800">DGID / SENTAX</span>
+          <span className="font-bold text-slate-800">DGID/DSI-SUPPORT</span>
         </div>
         <div className="flex items-center space-x-3">
         </div>
