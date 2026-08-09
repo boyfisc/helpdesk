@@ -37,8 +37,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   allAgents,
   onSelectNotificationTicket,
 }) => {
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: '1',
@@ -104,6 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         return <Bell className="w-4 h-4 text-slate-500" />;
     }
   };
+
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
       {/* Top Banner with DGID Identity */}
@@ -116,14 +117,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="font-bold text-slate-800">DGID / SENTAX</span>
         </div>
         <div className="flex items-center space-x-3">
-          <button
-            onClick={onOpenEmailHub}
-            className="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all border border-emerald-200"
-            title="Consulter le journal des emails envoyés par le système"
-          >
-            <Mail className="w-3 h-3 text-emerald-600" />
-            <span>Journal Mail</span>
-          </button>
         </div>
       </div>
 
@@ -131,10 +124,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="px-6 py-3 flex items-center justify-between">
         {/* Left Brand Title */}
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('public-home')}>
-          <div className="w-9 h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-lg shadow-sm">
-            <div className="w-4 h-4 border-2 border-yellow-400 rounded-sm bg-emerald-800 transform rotate-45 flex items-center justify-center">
-              <span className="text-[9px] text-yellow-300 font-bold">N</span>
-            </div>
+          <div className="w-auto px-2.5 h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-sm shadow-sm tracking-wider">
+            DGID
           </div>
           <div>
             <div className="flex items-center space-x-2">
@@ -200,15 +191,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Header Toolbar matching screenshot (Search, Gear, Bell Badge, User Profile) */}
         <div className="flex items-center space-x-2">
-          {/* Nouveau Ticket Button */}
-          <button
-            onClick={() => setCurrentView('create-incident')}
-            className="bg-[#008738] hover:bg-[#007530] text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all active:scale-98 mr-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Nouveau ticket</span>
-          </button>
-
           {/* Quick Action Icons matching screenshot */}
           <button
             onClick={onOpenTrackModal}
@@ -216,14 +198,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Recherche de tickets"
           >
             <Search className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={onOpenEmailHub}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
-            title="Paramètres & Hub Mail"
-          >
-            <Settings className="w-4 h-4" />
           </button>
 
           <div className="relative">
@@ -384,13 +358,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="lg:hidden p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors ml-1"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+
         </div>
       </div>
 

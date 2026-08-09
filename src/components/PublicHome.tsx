@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, FileText, Search, Filter, ShieldCheck, Clock, CheckCircle2, RefreshCw } from 'lucide-react';
+import { AlertCircle, FileText, Search, Filter, ShieldCheck, Clock, CheckCircle2, RefreshCw, Plus } from 'lucide-react';
 import { PLATFORMS, TAX_CENTERS } from '../constants';
 import { PublicTicket, TicketObjectType, UserAgent } from '../types';
 
@@ -88,6 +88,13 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
             </div>
 
             <div className="flex items-center space-x-3">
+              <button
+                onClick={() => onOpenCreateTicket('SIGNALER UN INCIDENT TECHNIQUE')}
+                className="bg-[#008738] hover:bg-[#007530] text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all active:scale-98"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Nouveau ticket</span>
+              </button>
               <button
                 onClick={onRefreshPublicTickets}
                 className="p-2 bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 text-xs font-semibold flex items-center space-x-1 transition-colors"

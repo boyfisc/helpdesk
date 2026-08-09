@@ -46,10 +46,8 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
       {/* Left Vibrant Green Sidebar matching screenshot */}
       <aside className="w-full md:w-16 lg:w-16 bg-[#008738] text-white shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start py-4 px-2 space-y-0 md:space-y-6 shadow-md z-30">
         {/* Top App Icon */}
-        <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-400/30 flex items-center justify-center text-white font-black text-xl shadow-inner">
-          <div className="w-4 h-4 bg-yellow-400 rounded-xs transform rotate-45 flex items-center justify-center">
-            <span className="text-[9px] text-emerald-950 font-black">N</span>
-          </div>
+        <div className="w-auto px-2 h-10 rounded-xl bg-emerald-900/60 border border-emerald-400/30 flex items-center justify-center text-white font-black text-sm shadow-inner tracking-wider">
+          DGID
         </div>
 
         {/* Sidebar Nav Icons matching screenshot */}

@@ -161,7 +161,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
         {/* Header */}
         <div className="bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 flex items-center justify-between border-b border-white/10">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-auto px-3 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-base sm:text-lg">
               DGID
             </div>
             <div>

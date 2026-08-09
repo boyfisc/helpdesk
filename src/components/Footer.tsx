@@ -14,11 +14,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEmailHub, onOpenTrackModal
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Col 1: Identity */}
           <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded bg-emerald-600 text-white font-bold flex items-center justify-center text-sm">
+            <div className="flex items-center space-x-3">
+              <div className="w-auto px-2.5 h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-sm shadow-sm tracking-wider">
                 DGID
               </div>
-              <span className="text-white font-bold text-base tracking-tight">SENTAX — Support</span>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl font-extrabold tracking-tight text-white">Helpdesk</span>
+                </div>
+              </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
               SaaS Officiel de gestion des incidents et requêtes techniques pour les agents et usagers des plateformes numériques de la Direction Générale des Impôts et des Domaines (DGID Senegal).
