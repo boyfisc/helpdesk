@@ -6,7 +6,10 @@ import { createServer as createViteServer } from 'vite';
 import { supabaseAdmin } from './src/db/supabase-server';
 import nodemailer from 'nodemailer';
 
-const app = express();
+export const app = express();
+
+// Add export default for Vercel
+export default app;
 const PORT = 3000;
 app.use(express.json({ limit: '50mb' }));
 
