@@ -1,19 +1,22 @@
 import React from 'react';
 import { Shield, Phone, Mail, MapPin, ExternalLink, HelpCircle } from 'lucide-react';
 
+import { UserAgent } from '../types';
+
 interface FooterProps {
+  user?: UserAgent | null;
   onOpenEmailHub: () => void;
   onOpenTrackModal: () => void;
   onOpenLogin: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenEmailHub, onOpenTrackModal, onOpenLogin }) => {
+export const Footer: React.FC<FooterProps> = ({ user, onOpenEmailHub, onOpenTrackModal, onOpenLogin }) => {
   return (
     <footer className="bg-slate-950 text-slate-400 text-sm border-t border-slate-900 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className={`grid grid-cols-1 ${user?.role === 'SUPER_ADMIN' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
           {/* Col 1: Identity */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center space-x-3">
               <div className="w-auto px-2.5 h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-sm shadow-sm tracking-wider">
                 DGID
@@ -35,7 +38,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEmailHub, onOpenTrackModal
 
           {/* Col 2: Services & Platforms */}
           <div>
-            <h4 className="text-white text-xs font-semibold uppercase tracking-wider mb-3">
+            <h4 className="text-white text-xs font-semibold uppercase tracking-wider mb-2">
               Plateformes Prises en Charge
             </h4>
             <ul className="space-y-1.5 text-xs text-slate-400">
@@ -48,11 +51,12 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEmailHub, onOpenTrackModal
           </div>
 
           {/* Col 3: Quick Navigation */}
+          {user?.role === 'SUPER_ADMIN' && (
           <div>
-            <h4 className="text-white text-xs font-semibold uppercase tracking-wider mb-3">
+            <h4 className="text-white text-xs font-semibold uppercase tracking-wider mb-2">
               Liens Rapides
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-1.5 text-xs">
               <li>
                 <button onClick={onOpenTrackModal} className="hover:text-emerald-400 flex items-center space-x-1 transition-colors">
                   <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
@@ -85,9 +89,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEmailHub, onOpenTrackModal
             </ul>
           </div>
 
+          )}
+
           {/* Col 4: Official Contact */}
           <div className="space-y-2 text-xs">
-            <h4 className="text-white font-semibold uppercase tracking-wider mb-3">
+            <h4 className="text-white font-semibold uppercase tracking-wider mb-2">
               Support Technique DGID
             </h4>
             <div className="flex items-start space-x-2">
@@ -105,7 +111,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEmailHub, onOpenTrackModal
           </div>
         </div>
 
-        <div className="border-t border-slate-900 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
+        <div className="border-t border-slate-900 mt-4 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
           <p>© {new Date().getFullYear()} Direction Générale des Impôts et des Domaines (DGID) — République du Sénégal.</p>
           <div className="mt-2 sm:mt-0 flex space-x-4 text-[11px]">
             <span>Version 2.4.0 (SENTAX ITSM)</span>

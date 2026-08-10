@@ -373,7 +373,7 @@ export default function App() {
         )}
 
         {/* Footer */}
-        <Footer
+        <Footer user={currentUser}
           onOpenEmailHub={() => setIsEmailHubOpen(true)}
           onOpenTrackModal={() => handleOpenTrackModal()}
           onOpenLogin={() => setIsLoginModalOpen(true)}
