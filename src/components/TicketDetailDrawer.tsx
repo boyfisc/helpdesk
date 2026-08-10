@@ -101,6 +101,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
               </button>
             )}
 
+            {ticket.status !== 'TERMINÉ' && (
             <button
               onClick={() => {
                 onOpenTransferModal(ticket);
@@ -110,6 +111,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
             >
               🟠 Transférer
             </button>
+            )}
 
             {ticket.status !== 'TERMINÉ' && (
               <button

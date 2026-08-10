@@ -307,9 +307,11 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
                               Prise en charge
                             </option>
                           )}
+                          {t.status !== 'TERMINÉ' && (
                           <option value="TRANSFERER" className="bg-white text-slate-900">
                             Transférer agent
                           </option>
+                          )}
                           {t.status !== 'TERMINÉ' && (
                             <option value="TERMINER" className="bg-white text-slate-900">
                               Clôturer ticket
