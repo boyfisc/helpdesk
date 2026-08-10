@@ -68,6 +68,7 @@ export default function App() {
   useEffect(() => {
     if (currentUser) {
       fetchPrivateTickets();
+      fetchAllAgents();
     }
   }, [currentUser]);
 
@@ -98,7 +99,9 @@ export default function App() {
     try {
       const res = await fetchApi('/api/agents');
       const data = await res.json();
-      setAllAgents(data);
+      if (Array.isArray(data)) {
+        setAllAgents(data);
+      }
     } catch (e) {
       console.error('Error fetching agents:', e);
     }
@@ -265,7 +268,8 @@ export default function App() {
           }}
           user={currentUser}
           onOpenLogin={() => setIsLoginModalOpen(true)}
-          onLogout={() => {
+          onLogout={async () => {
+            if (supabase) await supabase.auth.signOut();
             setCurrentUser(null);
             setCurrentView('public-home');
           }}

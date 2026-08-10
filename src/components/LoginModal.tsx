@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Shield, Lock, Mail, CheckCircle2, UserCheck, AlertCircle } from 'lucide-react';
 import { UserAgent } from '../types';
 import { supabase } from '../lib/supabase';
+import { fetchApi } from '../lib/api';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -45,15 +46,29 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         }
       }
 
-      const found = allAgents.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
-      if (!found) {
+      const res = await fetchApi('/api/agents');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const found = data.find((a: any) => a.email.toLowerCase() === email.trim().toLowerCase());
+        if (!found) {
+          setError('Compte agent non trouvé dans la base.');
+          setLoading(false);
+          return;
+        }
+        onLoginSuccess(found);
+        onClose();
+      } else {
+        // Fallback or error
+        if (Array.isArray(allAgents)) {
+          const fallbackFound = allAgents.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
+          if (fallbackFound) {
+            onLoginSuccess(fallbackFound);
+            onClose();
+            return;
+          }
+        }
         setError('Compte agent non trouvé dans la base.');
-        setLoading(false);
-        return;
       }
-
-      onLoginSuccess(found);
-      onClose();
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue.');
     }
