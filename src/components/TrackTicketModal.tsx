@@ -1,3 +1,4 @@
+import { fetchApi } from "../lib/api";
 import React, { useState } from 'react';
 import { X, Search, AlertCircle, CheckCircle2, Clock, ArrowRight, ShieldCheck, FileText, CornerDownRight } from 'lucide-react';
 
@@ -28,7 +29,7 @@ export const TrackTicketModal: React.FC<TrackTicketModalProps> = ({
     setTicketData(null);
 
     try {
-      const response = await fetch(`/api/tickets/track/${encodeURIComponent(searchNumber.trim())}`);
+      const response = await fetchApi(`/api/tickets/track/${encodeURIComponent(searchNumber.trim())}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -59,7 +60,9 @@ export const TrackTicketModal: React.FC<TrackTicketModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4" onClick={(e) => {
+      if (e.target === e.currentTarget) onClose();
+    }}>
       <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/60 w-full max-w-xl overflow-hidden my-6 transform transition-all">
         {/* Header */}
         <div className="bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 flex items-center justify-between border-b border-white/10">

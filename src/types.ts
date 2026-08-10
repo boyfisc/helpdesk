@@ -84,6 +84,7 @@ export interface PublicTicket {
   centreFiscal: string;
   createdAt: string;
   status: TicketStatus;
+  assignedAgentName?: string;
 }
 
 export interface TicketHistoryItem {

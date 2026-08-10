@@ -1,3 +1,4 @@
+import { fetchApi } from "../lib/api";
 import React, { useEffect, useState } from 'react';
 import { ShieldAlert, RefreshCw, Clock, User } from 'lucide-react';
 import { SystemAuditLog } from '../types';
@@ -13,7 +14,7 @@ export const AuditLogView: React.FC = () => {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/audit');
+      const res = await fetchApi('/api/audit');
       const data = await res.json();
       setLogs(data);
     } catch (e) {

@@ -1,3 +1,4 @@
+import { fetchApi } from "../lib/api";
 import React, { useEffect, useState } from 'react';
 import { Shield, CheckCircle2, Zap, Calendar, Users, FileText, Server } from 'lucide-react';
 import { SubscriptionInfo } from '../types';
@@ -6,7 +7,7 @@ export const SubscriptionView: React.FC = () => {
   const [sub, setSub] = useState<SubscriptionInfo | null>(null);
 
   useEffect(() => {
-    fetch('/api/subscription')
+    fetchApi('/api/subscription')
       .then((res) => res.json())
       .then((data) => setSub(data))
       .catch(console.error);

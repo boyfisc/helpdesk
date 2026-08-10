@@ -1,3 +1,4 @@
+import { fetchApi } from "../lib/api";
 import React, { useEffect, useState } from 'react';
 import {
   X,
@@ -44,7 +45,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
     if (!ticket) return;
     setLoadingHistory(true);
     try {
-      const res = await fetch(`/api/tickets/${ticket.id}`);
+      const res = await fetchApi(`/api/tickets/${ticket.id}`);
       const data = await res.json();
       if (data.history) {
         setHistory(data.history);
@@ -59,7 +60,9 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
   if (!ticket) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/60 backdrop-blur-md flex justify-end">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/60 backdrop-blur-md flex justify-end" onClick={(e) => {
+      if (e.target === e.currentTarget) onClose();
+    }}>
       <div className="bg-white/90 backdrop-blur-2xl w-full max-w-2xl h-full shadow-2xl flex flex-col overflow-hidden transform transition-all border-l border-white/60">
         {/* Top Header */}
         <div className="bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
@@ -184,6 +187,17 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                   <div key={idx} className="flex items-center space-x-2 bg-slate-100 p-2 rounded border border-slate-200 text-xs font-mono">
                     <Paperclip className="w-3.5 h-3.5 text-slate-500" />
                     <span>{att.name} ({att.size})</span>
+                    {att.url && (
+                      <a 
+                        href={att.url} 
+                        download={att.name}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ml-auto text-emerald-600 hover:text-emerald-800 text-[11px] font-bold underline"
+                      >
+                        Consulter
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>

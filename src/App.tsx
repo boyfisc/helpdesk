@@ -1,3 +1,4 @@
+import { fetchApi } from "./lib/api";
 import React, { useEffect, useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -16,6 +17,8 @@ import { AuditLogView } from './components/AuditLogView';
 import { TicketDetailDrawer } from './components/TicketDetailDrawer';
 import { TransferModal } from './components/TransferModal';
 import { ResolveModal } from './components/ResolveModal';
+import { UpdatePasswordModal } from './components/UpdatePasswordModal';
+import { supabase } from './lib/supabase';
 import { PublicTicket, Ticket, TicketObjectType, UserAgent } from './types';
 
 export default function App() {
@@ -32,6 +35,7 @@ export default function App() {
 
   const [isEmailHubOpen, setIsEmailHubOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isUpdatePasswordOpen, setIsUpdatePasswordOpen] = useState(false);
 
   const [selectedTicketForDrawer, setSelectedTicketForDrawer] = useState<Ticket | null>(null);
   const [selectedTicketForTransfer, setSelectedTicketForTransfer] = useState<Ticket | null>(null);
@@ -48,6 +52,17 @@ export default function App() {
   useEffect(() => {
     fetchPublicTickets();
     fetchAllAgents();
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setIsUpdatePasswordOpen(true);
+        }
+      });
+      if (window.location.hash.includes("type=recovery")) {
+        setIsUpdatePasswordOpen(true);
+      }
+      return () => subscription?.unsubscribe();
+    }
   }, []);
 
   useEffect(() => {
@@ -59,7 +74,7 @@ export default function App() {
   const fetchPublicTickets = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/tickets/public');
+      const res = await fetchApi('/api/tickets/public');
       const data = await res.json();
       setPublicTickets(data);
     } catch (e) {
@@ -71,7 +86,7 @@ export default function App() {
 
   const fetchPrivateTickets = async () => {
     try {
-      const res = await fetch('/api/tickets/private');
+      const res = await fetchApi('/api/tickets/private');
       const data = await res.json();
       setAllTickets(data);
     } catch (e) {
@@ -81,14 +96,9 @@ export default function App() {
 
   const fetchAllAgents = async () => {
     try {
-      const res = await fetch('/api/agents');
+      const res = await fetchApi('/api/agents');
       const data = await res.json();
       setAllAgents(data);
-      if (data.length > 0 && !currentUser) {
-        // Default connected agent for quick demo
-        setCurrentUser(data[0]);
-        setCurrentView('backoffice');
-      }
     } catch (e) {
       console.error('Error fetching agents:', e);
     }
@@ -115,11 +125,11 @@ export default function App() {
   const handleTakeOver = async (ticketId: string) => {
     if (!currentUser) return;
     try {
-      const res = await fetch(`/api/tickets/${ticketId}/status`, {
+      const res = await fetchApi(`/api/tickets/${ticketId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'PRISE_EN_CHARGE',
+          action: 'TAKE_OVER', status: 'PRISE EN CHARGE',
           agentId: currentUser.id,
           agentName: `${currentUser.firstName} ${currentUser.lastName}`,
         }),
@@ -136,11 +146,11 @@ export default function App() {
 
   const handleConfirmTransfer = async (ticketId: string, targetAgent: UserAgent, reason: string) => {
     try {
-      const res = await fetch(`/api/tickets/${ticketId}/status`, {
+      const res = await fetchApi(`/api/tickets/${ticketId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'TRANSFERER',
+          action: 'TRANSFER', status: 'TRANSFÉRÉ',
           agentName: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Superviseur',
           targetAgentId: targetAgent.id,
           targetAgentName: `${targetAgent.firstName} ${targetAgent.lastName}`,
@@ -159,11 +169,11 @@ export default function App() {
 
   const handleConfirmResolve = async (ticketId: string, resolutionComment: string) => {
     try {
-      const res = await fetch(`/api/tickets/${ticketId}/status`, {
+      const res = await fetchApi(`/api/tickets/${ticketId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'TERMINER',
+          action: 'RESOLVE', status: 'TERMINÉ',
           agentName: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Agent Support',
           resolutionComment,
         }),
@@ -180,7 +190,7 @@ export default function App() {
 
   const handleAddAgent = async (newAgentData: Partial<UserAgent>) => {
     try {
-      const res = await fetch('/api/agents', {
+      const res = await fetchApi('/api/agents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAgentData),
@@ -188,6 +198,7 @@ export default function App() {
 
       if (res.ok) {
         fetchAllAgents();
+
       }
     } catch (e) {
       console.error(e);
@@ -196,7 +207,7 @@ export default function App() {
 
   const handleUpdateAgent = async (id: string, data: Partial<UserAgent>) => {
     try {
-      const res = await fetch(`/api/agents/${id}`, {
+      const res = await fetchApi(`/api/agents/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -204,6 +215,7 @@ export default function App() {
 
       if (res.ok) {
         fetchAllAgents();
+
       }
     } catch (e) {
       console.error(e);
@@ -211,8 +223,9 @@ export default function App() {
   };
 
   const handleSelectNotificationTicket = (ticketNumber?: string) => {
-    if (!currentUser && allAgents.length > 0) {
-      setCurrentUser(allAgents[0]);
+    if (!currentUser) {
+      setIsLoginModalOpen(true);
+      return;
     }
     setCurrentView('backoffice');
     setBackofficeTab('tickets');
@@ -235,9 +248,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#e5ebe3] flex flex-col font-sans text-slate-900 antialiased selection:bg-emerald-600 selection:text-white relative p-2 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-[#e5ebe3] flex flex-col font-sans text-slate-900 antialiased selection:bg-emerald-600 selection:text-white relative">
       {/* Outer Application Card Shell matching the desktop helpdesk screenshot */}
-      <div className="max-w-[1600px] w-full mx-auto bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col min-h-[calc(100vh-2rem)]">
+      <div className="w-full bg-white overflow-hidden flex flex-col min-h-screen">
         {/* Top Main Navbar */}
         <Navbar
           currentView={currentView}
@@ -369,6 +382,7 @@ export default function App() {
 
       <EmailHubModal isOpen={isEmailHubOpen} onClose={() => setIsEmailHubOpen(false)} />
 
+      <UpdatePasswordModal isOpen={isUpdatePasswordOpen} onClose={() => setIsUpdatePasswordOpen(false)} />
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

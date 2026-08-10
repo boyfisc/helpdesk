@@ -1,3 +1,4 @@
+import { fetchApi } from "../lib/api";
 import React, { useEffect, useState } from 'react';
 import { X, Mail, CheckCircle2, Clock, Send, Shield, AlertCircle } from 'lucide-react';
 import { EmailNotification } from '../types';
@@ -21,7 +22,7 @@ export const EmailHubModal: React.FC<EmailHubModalProps> = ({ isOpen, onClose })
   const fetchEmails = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/emails');
+      const res = await fetchApi('/api/emails');
       const data = await res.json();
       setEmails(data);
       if (data.length > 0) {
@@ -37,7 +38,9 @@ export const EmailHubModal: React.FC<EmailHubModalProps> = ({ isOpen, onClose })
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4" onClick={(e) => {
+      if (e.target === e.currentTarget) onClose();
+    }}>
       <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/60 w-full max-w-4xl overflow-hidden my-6 transform transition-all h-[85vh] flex flex-col">
         {/* Header */}
         <div className="bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
@@ -123,7 +126,7 @@ export const EmailHubModal: React.FC<EmailHubModalProps> = ({ isOpen, onClose })
                       <strong>Destinataire :</strong> <span className="font-mono text-emerald-700">{selectedEmail.recipient}</span>
                     </div>
                     <div>
-                      <strong>Expéditeur :</strong> <span className="font-mono text-slate-700">no-reply-support@dgid.sn</span>
+                      <strong>Expéditeur :</strong> <span className="font-mono text-slate-700">dsi.dgid@gmail.com</span>
                     </div>
                   </div>
                 </div>

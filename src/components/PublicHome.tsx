@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, FileText, Search, Filter, ShieldCheck, Clock, CheckCircle2, RefreshCw, Plus } from 'lucide-react';
+import { AlertCircle, FileText, Search, Filter, ShieldCheck, Clock, CheckCircle2, RefreshCw, Plus, User } from 'lucide-react';
 import { PLATFORMS, TAX_CENTERS } from '../constants';
 import { PublicTicket, TicketObjectType, UserAgent } from '../types';
 
@@ -188,7 +188,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 <th className="px-4 py-3">Centre Fiscal</th>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th className="px-4 py-3">Agent assigné</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -219,18 +219,14 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                       {new Date(t.createdAt).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-4 py-3 max-w-[120px]">{getStatusBadge(t.status)}</td>
-                    <td className="px-4 py-3 text-right">
-                      {user && (
-                        <button
-                          onClick={() => {
-                            if (onOpenTicketDetail) {
-                              onOpenTicketDetail(t.ticketNumber);
-                            }
-                          }}
-                          className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline text-[11px]"
-                        >
-                          Suivre
-                        </button>
+                    <td className="px-4 py-3">
+                      {t.assignedAgentName ? (
+                        <div className="flex items-center space-x-1 text-slate-700">
+                          <User className="w-3 h-3 text-emerald-600" />
+                          <span className="truncate max-w-[120px]">{t.assignedAgentName}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 italic text-[11px]">Non assigné</span>
                       )}
                     </td>
                   </tr>

@@ -75,6 +75,11 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
     return matchesSearch && matchesStatus && matchesPlatform && matchesCenter && matchesAgent;
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
+  const paginatedTickets = filteredTickets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   const getStatusBadge = (status: string) => {
     const baseClass = "text-[11px] px-2.5 py-1 rounded-full font-bold inline-flex items-center space-x-1.5 truncate max-w-full align-middle";
     switch (status) {
@@ -212,14 +217,14 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredTickets.length === 0 ? (
+              {paginatedTickets.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-10 text-center text-slate-400">
                     Aucun ticket ne correspond à vos filtres.
                   </td>
                 </tr>
               ) : (
-                filteredTickets.map((t, idx) => (
+                paginatedTickets.map((t, idx) => (
                   <tr
                     key={t.id}
                     className={`${idx % 2 === 1 ? 'bg-[#f8fafc]' : 'bg-white'} hover:bg-emerald-50/40 transition-colors`}
@@ -323,33 +328,39 @@ export const TicketsView: React.FC<TicketsViewProps> = ({
         {/* Bottom Table Footer Pagination matching screenshot */}
         <div className="bg-[#f8fafc] border-t border-slate-200 px-6 py-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
           <div className="flex items-center space-x-2">
-            <span>Afficher par :</span>
-            <select className="bg-white border border-slate-200 rounded px-2 py-1 text-xs font-bold focus:outline-none">
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-            </select>
+            <span>Afficher de {(currentPage - 1) * itemsPerPage + 1} à {Math.min(currentPage * itemsPerPage, filteredTickets.length)} sur {filteredTickets.length}</span>
           </div>
-
-          <div className="flex items-center space-x-1.5">
-            <button className="px-2.5 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-bold text-slate-700">
-              «
-            </button>
-            <button className="px-3 py-1 rounded bg-[#008738] text-white font-bold">1</button>
-            <button className="px-3 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-semibold text-slate-700">
-              2
-            </button>
-            <button className="px-3 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-semibold text-slate-700">
-              3
-            </button>
-            <span className="px-1 text-slate-400">...</span>
-            <button className="px-3 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-semibold text-slate-700">
-              16
-            </button>
-            <button className="px-2.5 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-bold text-slate-700">
-              »
-            </button>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center space-x-1.5">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-2.5 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-bold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                «
+              </button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded font-bold ${
+                    currentPage === i + 1
+                      ? 'bg-[#008738] text-white'
+                      : 'bg-white border border-slate-200 hover:bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-2.5 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 font-bold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                »
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

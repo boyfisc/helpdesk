@@ -108,28 +108,26 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
       {/* Top Banner with DGID Identity */}
-      <div className="bg-[#f8fafc] text-slate-600 text-[11px] px-6 py-1 flex items-center justify-between border-b border-slate-200/80">
-        <div className="flex items-center space-x-2 font-medium">
-          <span className="font-extrabold text-emerald-700 uppercase tracking-wider">RÉPUBLIQUE DU SÉNÉGAL</span>
-          <span>•</span>
-          <span className="font-bold text-slate-800">DGID/DSI-SUPPORT</span>
-        </div>
-        <div className="flex items-center space-x-3">
+      <div className="bg-[#f8fafc] text-slate-600 text-[11px] px-4 sm:px-6 py-1 flex items-center justify-between border-b border-slate-200/80">
+        <div className="flex items-center space-x-1 sm:space-x-2 font-medium">
+          <span className="font-extrabold text-emerald-700 uppercase tracking-wider text-[9px] sm:text-[11px]">RÉPUBLIQUE DU SÉNÉGAL</span>
+          <span className="hidden sm:inline">•</span>
+          <span className="font-bold text-slate-800 text-[9px] sm:text-[11px]">DGID/DSI-SUPPORT</span>
         </div>
       </div>
 
       {/* Main Header Bar */}
-      <div className="px-6 py-3 flex items-center justify-between">
+      <div className="px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-between">
         {/* Left Brand Title */}
-        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('public-home')}>
-          <div className="w-auto px-2.5 h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-sm shadow-sm tracking-wider">
+        <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => setCurrentView('public-home')}>
+          <div className="w-auto px-2 sm:px-2.5 h-7 sm:h-9 rounded-xl bg-[#008738] flex items-center justify-center text-white font-black text-xs sm:text-sm shadow-sm tracking-wider">
             DGID
           </div>
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xl font-extrabold tracking-tight text-[#0f172a]">Helpdesk</span>
-              <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-emerald-200">
-                DGID SENTAX
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <span className="text-lg sm:text-xl font-extrabold tracking-tight text-[#0f172a]">Helpdesk</span>
+              <span className="hidden sm:inline-block bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-emerald-200">
+                support
               </span>
             </div>
           </div>
@@ -148,29 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             Accueil Portail
           </button>
 
-          <button
-            onClick={() => setCurrentView('create-incident')}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 flex items-center space-x-1.5 transition-all"
-          >
-            <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-            <span>Incident</span>
-          </button>
 
-          <button
-            onClick={() => setCurrentView('create-request')}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 flex items-center space-x-1.5 transition-all"
-          >
-            <FileText className="w-3.5 h-3.5 text-sky-600" />
-            <span>Requête</span>
-          </button>
-
-          <button
-            onClick={onOpenTrackModal}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center space-x-1.5 transition-all"
-          >
-            <Search className="w-3.5 h-3.5 text-slate-500" />
-            <span>Suivi Ticket</span>
-          </button>
 
           {user && (
             <button
@@ -192,10 +168,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Quick Action Icons matching screenshot */}
           <button
             onClick={onOpenTrackModal}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors relative"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 flex items-center space-x-1.5 transition-all"
             title="Recherche de tickets"
           >
-            <Search className="w-4 h-4" />
+            <Search className="w-4 h-4 text-slate-500" />
+            <span className="hidden sm:inline">Suivi Ticket</span>
           </button>
 
           <div className="relative">
@@ -321,22 +298,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </span>
               </div>
 
-              {/* Agent Quick Selector */}
-              <select
-                value={user.id}
-                onChange={(e) => {
-                  const selected = allAgents.find((a) => a.id === e.target.value);
-                  if (selected) onQuickSelectAgent(selected);
-                }}
-                className="bg-white text-[10px] font-medium text-slate-700 border border-slate-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 ml-1 cursor-pointer w-16 truncate hidden sm:block"
-                title="Sélecteur d'Agent Démo"
-              >
-                {allAgents.map((ag) => (
-                  <option key={ag.id} value={ag.id}>
-                    {ag.firstName}
-                  </option>
-                ))}
-              </select>
 
               <button
                 onClick={onLogout}
@@ -355,8 +316,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Connexion</span>
             </button>
           )}
-
-
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors ml-2"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
 
@@ -375,26 +341,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             Accueil Portail
-          </button>
-          <button
-            onClick={() => {
-              setCurrentView('create-incident');
-              setIsMobileMenuOpen(false);
-            }}
-            className="px-4 py-2.5 rounded-lg text-sm font-bold text-rose-700 hover:bg-rose-100 text-left flex items-center space-x-2"
-          >
-            <AlertCircle className="w-4 h-4" />
-            <span>Incident</span>
-          </button>
-          <button
-            onClick={() => {
-              setCurrentView('create-request');
-              setIsMobileMenuOpen(false);
-            }}
-            className="px-4 py-2.5 rounded-lg text-sm font-bold text-sky-700 hover:bg-sky-100 text-left flex items-center space-x-2"
-          >
-            <FileText className="w-4 h-4" />
-            <span>Requête</span>
           </button>
           <button
             onClick={() => {

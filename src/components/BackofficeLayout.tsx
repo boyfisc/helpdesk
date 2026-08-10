@@ -44,9 +44,9 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
   return (
     <div className="flex flex-col md:flex-row min-h-[calc(100vh-5rem)] bg-[#f8fafc] relative">
       {/* Left Vibrant Green Sidebar matching screenshot */}
-      <aside className="w-full md:w-16 lg:w-16 bg-[#008738] text-white shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start py-4 px-2 space-y-0 md:space-y-6 shadow-md z-30">
+      <aside className="w-full md:w-16 lg:w-16 bg-[#008738] text-white shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start py-2 sm:py-4 px-2 space-y-0 md:space-y-6 shadow-md z-30">
         {/* Sidebar Nav Icons matching screenshot */}
-        <nav className="flex flex-row md:flex-col items-center space-x-2 md:space-x-0 md:space-y-3 w-full">
+        <nav className="flex flex-row md:flex-col items-center space-x-2 md:space-x-0 md:space-y-3 w-full overflow-x-auto overflow-y-hidden md:overflow-visible scrollbar-hide py-1">
           {/* Dashboard / Accueil */}
           <div className="relative w-full flex justify-center group">
             {currentTab === 'dashboard' && (
@@ -144,9 +144,9 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
       {/* Main Content Container with Top Tab Toolbar */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         {/* Top Status Tabs Bar matching screenshot */}
-        <div className="bg-white border-b border-slate-200 px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           {/* Status Tabs with count badges */}
-          <div className="flex items-center space-x-2 sm:space-x-6 text-xs overflow-x-auto">
+          <div className="flex items-center space-x-4 sm:space-x-6 text-xs overflow-x-auto scrollbar-hide w-full sm:w-auto pb-1 sm:pb-0 border-b border-slate-100 sm:border-0">
             <button
               onClick={() => { setCurrentTab('tickets'); setStatusFilter('ALL'); }}
               className={`pb-1 font-bold flex items-center space-x-2 transition-all border-b-2 ${
@@ -193,9 +193,9 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
           </div>
 
           {/* Right Toolbar Options matching screenshot */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 w-full sm:w-auto overflow-x-auto scrollbar-hide pb-1 sm:pb-0">
             {/* Uniquement mes tickets filter checkbox */}
-            <label className="flex items-center space-x-2 text-xs font-medium text-slate-600 cursor-pointer select-none">
+            <label className="flex items-center space-x-2 text-xs font-medium text-slate-600 cursor-pointer select-none shrink-0 whitespace-nowrap">
               <input
                 type="checkbox"
                 checked={currentTab === 'my-tickets'}
@@ -208,7 +208,7 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
             {/* Filter button */}
             <button
               onClick={() => setCurrentTab('tickets')}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all shrink-0 whitespace-nowrap"
             >
               <Filter className="w-3.5 h-3.5 text-slate-500" />
               <span>Filtres</span>
@@ -220,7 +220,7 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
             {/* Primary Action Button: + Nouveau ticket */}
             <button
               onClick={() => onOpenCreateTicket && onOpenCreateTicket('SIGNALER UN INCIDENT TECHNIQUE')}
-              className="bg-[#00a83e] hover:bg-[#009135] text-white px-4 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all active:scale-98"
+              className="bg-[#00a83e] hover:bg-[#009135] text-white px-4 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all active:scale-98 shrink-0 whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
               <span>Nouveau ticket</span>
@@ -230,29 +230,29 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
 
         {/* Backoffice Page Sub-Navigation (if admin/super) */}
         {isAdminOrSuper && (
-          <div className="bg-slate-100/80 border-b border-slate-200 px-6 py-2 flex items-center space-x-4 text-xs font-medium text-slate-600">
-            <span className="font-bold text-slate-800">Sections DSI:</span>
+          <div className="bg-slate-100/80 border-b border-slate-200 px-4 sm:px-6 py-2 flex items-center space-x-4 text-xs font-medium text-slate-600 overflow-x-auto scrollbar-hide">
+            <span className="font-bold text-slate-800 shrink-0">Sections DSI:</span>
             <button
               onClick={() => setCurrentTab('dashboard')}
-              className={`hover:text-emerald-700 ${currentTab === 'dashboard' ? 'text-emerald-700 font-bold' : ''}`}
+              className={`hover:text-emerald-700 shrink-0 ${currentTab === 'dashboard' ? 'text-emerald-700 font-bold' : ''}`}
             >
               Tableau de bord
             </button>
             <button
               onClick={() => setCurrentTab('tickets')}
-              className={`hover:text-emerald-700 ${currentTab === 'tickets' ? 'text-emerald-700 font-bold' : ''}`}
+              className={`hover:text-emerald-700 shrink-0 ${currentTab === 'tickets' ? 'text-emerald-700 font-bold' : ''}`}
             >
               Tous les tickets
             </button>
             <button
               onClick={() => setCurrentTab('agents')}
-              className={`hover:text-emerald-700 ${currentTab === 'agents' ? 'text-emerald-700 font-bold' : ''}`}
+              className={`hover:text-emerald-700 shrink-0 ${currentTab === 'agents' ? 'text-emerald-700 font-bold' : ''}`}
             >
               Gestion Agents
             </button>
             <button
               onClick={() => setCurrentTab('stats')}
-              className={`hover:text-emerald-700 ${currentTab === 'stats' ? 'text-emerald-700 font-bold' : ''}`}
+              className={`hover:text-emerald-700 shrink-0 ${currentTab === 'stats' ? 'text-emerald-700 font-bold' : ''}`}
             >
               Statistiques DSI
             </button>
@@ -260,13 +260,13 @@ export const BackofficeLayout: React.FC<BackofficeLayoutProps> = ({
               <>
                 <button
                   onClick={() => setCurrentTab('subscription')}
-                  className={`hover:text-emerald-700 ${currentTab === 'subscription' ? 'text-emerald-700 font-bold' : ''}`}
+                  className={`hover:text-emerald-700 shrink-0 ${currentTab === 'subscription' ? 'text-emerald-700 font-bold' : ''}`}
                 >
                   Souscription
                 </button>
                 <button
                   onClick={() => setCurrentTab('audit')}
-                  className={`hover:text-emerald-700 ${currentTab === 'audit' ? 'text-emerald-700 font-bold' : ''}`}
+                  className={`hover:text-emerald-700 shrink-0 ${currentTab === 'audit' ? 'text-emerald-700 font-bold' : ''}`}
                 >
                   Audit Sécurité
                 </button>

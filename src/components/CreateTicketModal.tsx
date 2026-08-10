@@ -1,3 +1,4 @@
+import { fetchApi } from "../lib/api";
 import React, { useState } from 'react';
 import {
   X,
@@ -46,7 +47,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   const [centreFiscal, setCentreFiscal] = useState(TAX_CENTERS[0]);
   const [description, setDescription] = useState('');
 
-  const [attachments, setAttachments] = useState<{ name: string; size: string; type: string }[]>([]);
+  const [attachments, setAttachments] = useState<{ name: string; size: string; type: string; url?: string }[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successData, setSuccessData] = useState<{ ticketNumber: string } | null>(null);
@@ -58,14 +59,21 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       const sizeKb = Math.round(file.size / 1024);
-      setAttachments([
-        ...attachments,
-        {
-          name: file.name,
-          size: `${sizeKb} KB`,
-          type: file.type || 'document',
-        },
-      ]);
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Url = event.target?.result as string;
+        setAttachments((prev) => [
+          ...prev,
+          {
+            name: file.name,
+            size: `${sizeKb} KB`,
+            type: file.type || 'document',
+            url: base64Url
+          },
+        ]);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -106,7 +114,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/tickets', {
+      const response = await fetchApi('/api/tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -156,7 +164,9 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4" onClick={(e) => {
+      if (e.target === e.currentTarget) onClose();
+    }}>
       <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/60 w-full max-w-3xl overflow-hidden my-6 transform transition-all">
         {/* Header */}
         <div className="bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 flex items-center justify-between border-b border-white/10">
