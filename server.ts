@@ -14,12 +14,17 @@ let transporter: nodemailer.Transporter | null = null;
 function getTransporter() {
   if (!transporter && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_PASS !== 'YOUR_GMAIL_APP_PASSWORD') {
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-      }
-    });
+      },
+      // Force IPv4 as some environments like Railway don't support IPv6 out of the box
+      // which results in ENETUNREACH errors when attempting to connect to smtp.gmail.com over IPv6.
+      family: 4
+    } as any);
   }
   return transporter;
 }
