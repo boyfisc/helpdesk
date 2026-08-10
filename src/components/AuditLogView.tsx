@@ -18,7 +18,7 @@ export const AuditLogView: React.FC = () => {
       const data = await res.json();
       setLogs(data);
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     } finally {
       setLoading(false);
     }

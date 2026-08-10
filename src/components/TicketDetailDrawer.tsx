@@ -51,7 +51,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
         setHistory(data.history);
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     } finally {
       setLoadingHistory(false);
     }

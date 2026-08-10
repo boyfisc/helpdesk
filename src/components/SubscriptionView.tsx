@@ -10,7 +10,7 @@ export const SubscriptionView: React.FC = () => {
     fetchApi('/api/subscription')
       .then((res) => res.json())
       .then((data) => setSub(data))
-      .catch(console.error);
+      .catch(console.warn);
   }, []);
 
   if (!sub) return <div className="p-8 text-center text-xs text-slate-500">Chargement des données de souscription...</div>;

@@ -29,7 +29,7 @@ export const EmailHubModal: React.FC<EmailHubModalProps> = ({ isOpen, onClose })
         setSelectedEmail(data[0]);
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     } finally {
       setLoading(false);
     }

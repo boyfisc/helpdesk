@@ -77,9 +77,14 @@ export default function App() {
     try {
       const res = await fetchApi('/api/tickets/public');
       const data = await res.json();
-      setPublicTickets(data);
+      if (Array.isArray(data)) {
+        setPublicTickets(data);
+      } else {
+        // invalid data received
+        setPublicTickets([]);
+      }
     } catch (e) {
-      console.error('Error fetching public tickets:', e);
+      console.warn('Error fetching public tickets:', e);
     } finally {
       setLoading(false);
     }
@@ -89,9 +94,14 @@ export default function App() {
     try {
       const res = await fetchApi('/api/tickets/private');
       const data = await res.json();
-      setAllTickets(data);
+      if (Array.isArray(data)) {
+        setAllTickets(data);
+      } else {
+        // invalid data received
+        setAllTickets([]);
+      }
     } catch (e) {
-      console.error('Error fetching private tickets:', e);
+      console.warn('Error fetching private tickets:', e);
     }
   };
 
@@ -103,7 +113,7 @@ export default function App() {
         setAllAgents(data);
       }
     } catch (e) {
-      console.error('Error fetching agents:', e);
+      console.warn('Error fetching agents:', e);
     }
   };
 
@@ -143,7 +153,7 @@ export default function App() {
         fetchPrivateTickets();
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   };
 
@@ -166,7 +176,7 @@ export default function App() {
         fetchPrivateTickets();
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   };
 
@@ -187,7 +197,7 @@ export default function App() {
         fetchPrivateTickets();
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   };
 
@@ -204,7 +214,7 @@ export default function App() {
 
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   };
 
@@ -221,7 +231,7 @@ export default function App() {
 
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   };
 

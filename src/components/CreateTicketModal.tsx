@@ -59,6 +59,10 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       const sizeKb = Math.round(file.size / 1024);
+      if (sizeKb > 1024) {
+        setErrorMessage("Le fichier est trop volumineux (limite: 1 MB).");
+        return;
+      }
       
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -134,7 +138,16 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
         }),
       });
 
-      const data = await response.json();
+      let data: any;
+      const text = await response.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        if (text.includes("The page") || text.includes("413") || response.status === 413) {
+          throw new Error("Le fichier est trop volumineux pour être envoyé.");
+        }
+        throw new Error("Erreur serveur: " + text.substring(0, 50));
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Erreur lors de la création du ticket.');
