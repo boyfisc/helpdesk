@@ -58,6 +58,7 @@ export default function App() {
           fetchApi('/api/agents')
             .then(res => res.json())
             .then((data) => {
+              if (!Array.isArray(data)) return;
               const found = data.find((a: UserAgent) => a.email === session.user.email);
               if (found) {
                 setCurrentUser(found);
@@ -74,6 +75,7 @@ export default function App() {
           fetchApi('/api/agents')
             .then(res => res.json())
             .then((data) => {
+              if (!Array.isArray(data)) return;
               const found = data.find((a: UserAgent) => a.email === session.user.email);
               if (found) {
                 setCurrentUser(found);

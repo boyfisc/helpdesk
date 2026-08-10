@@ -41,7 +41,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
     return res.status(401).json({ error: "Non autorisé: Token manquant" });
   }
   const token = authHeader.split(" ")[1];
-  if (!supabaseAdmin) return res.status(500).json({ error: "Supabase non configuré" });
+  if (!supabaseAdmin) return res.status(400).json({ error: "Supabase non configuré" });
   const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
   if (error || !user) {
     return res.status(401).json({ error: "Non autorisé: Token invalide" });
@@ -56,12 +56,12 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 app.get('/api/tickets/public', async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { data, error } = await supabaseAdmin
     .from('tickets')
     .select('id, ticket_number, object_type, platform, centre_fiscal, created_at, status, agents(first_name, last_name)')
     .order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   // Transform to match frontend types (camelCase)
   const formatted = (data || []).map((t: any) => ({
@@ -78,7 +78,7 @@ app.get('/api/tickets/public', async (req: Request, res: Response) => {
 });
 
 app.get('/api/tickets/track/:number', async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { number } = req.params;
   const { data, error } = await supabaseAdmin
     .from('tickets')
@@ -132,14 +132,14 @@ app.get('/api/tickets/track/:number', async (req: Request, res: Response) => {
 });
 
 app.get('/api/tickets/private', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   
   const { data: tickets, error } = await supabaseAdmin
     .from('tickets')
     .select('*, agents(first_name, last_name)')
     .order('created_at', { ascending: false });
     
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   const formatted = tickets.map((t: any) => ({
     id: t.id,
@@ -171,7 +171,7 @@ app.get('/api/tickets/private', authMiddleware, async (req: Request, res: Respon
 });
 
 app.get('/api/tickets/:id', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { id } = req.params;
   const { data, error } = await supabaseAdmin
     .from('tickets')
@@ -319,7 +319,7 @@ async function processAttachments(ticketNumber: string, attachments: any[]) {
 }
 
 app.post('/api/tickets', async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const payload = req.body;
   
   const year = new Date().getFullYear();
@@ -360,7 +360,7 @@ app.post('/api/tickets', async (req: Request, res: Response) => {
     status: 'EN ATTENTE'
   }).select().single();
   
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   await supabaseAdmin.from('ticket_history').insert({
     ticket_id: newTicket.id,
@@ -385,7 +385,7 @@ app.post('/api/tickets', async (req: Request, res: Response) => {
 });
 
 app.patch('/api/tickets/:id/status', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { id } = req.params;
   const { status, action, agentId, agentName, targetAgentId, targetAgentName, resolutionComment, userEmail, userRole } = req.body;
   
@@ -406,7 +406,7 @@ app.patch('/api/tickets/:id/status', authMiddleware, async (req: Request, res: R
   }
   
   const { error: updateErr } = await supabaseAdmin.from('tickets').update(updateData).eq('id', id);
-  if (updateErr) return res.status(500).json({ error: updateErr.message });
+  if (updateErr) return res.status(400).json({ error: updateErr.message });
   
   let comment = '';
   if (action === 'TRANSFER') comment = `Transféré à ${targetAgentName}`;
@@ -436,9 +436,9 @@ app.patch('/api/tickets/:id/status', authMiddleware, async (req: Request, res: R
 });
 
 app.get('/api/agents', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { data, error } = await supabaseAdmin.from('agents').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   const formatted = (data || []).map(a => ({
     id: a.id,
@@ -459,7 +459,7 @@ app.get('/api/agents', authMiddleware, async (req: Request, res: Response) => {
 });
 
 app.post('/api/agents', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const payload = req.body;
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email: payload.email,
@@ -486,13 +486,13 @@ app.post('/api/agents', authMiddleware, async (req: Request, res: Response) => {
     status: payload.status || 'ACTIVE'
   }).select().single();
   
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   await logAudit('CREATION_AGENT', `Agent ${payload.email} créé`);
   res.status(201).json(data);
 });
 
 app.patch('/api/agents/:id', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { id } = req.params;
   const payload = req.body;
   
@@ -501,16 +501,16 @@ app.patch('/api/agents/:id', authMiddleware, async (req: Request, res: Response)
   if (payload.role !== undefined) updateData.role = payload.role;
   
   const { error } = await supabaseAdmin.from('agents').update(updateData).eq('id', id);
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   await logAudit('MODIFICATION_AGENT', `Agent ${id} modifié`);
   res.json({ success: true });
 });
 
 app.get('/api/stats', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { data, error } = await supabaseAdmin.from('tickets').select('status, platform, object_type, created_at');
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   const total = (data || []).length;
   const byStatus: Record<string, number> = { 'EN ATTENTE': 0, 'PRISE EN CHARGE': 0, 'TRANSFÉRÉ': 0, 'TERMINÉ': 0 };
@@ -539,9 +539,9 @@ app.get('/api/stats', authMiddleware, async (req: Request, res: Response) => {
 });
 
 app.get('/api/emails', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { data, error } = await supabaseAdmin.from('email_notifications').select('*').order('sent_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   const formatted = (data || []).map(e => ({
     id: e.id,
@@ -558,9 +558,9 @@ app.get('/api/emails', authMiddleware, async (req: Request, res: Response) => {
 });
 
 app.get('/api/audit', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { data, error } = await supabaseAdmin.from('audit_logs').select('*').order('timestamp', { ascending: false }).limit(100);
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(400).json({ error: error.message });
   
   const formatted = data.map(a => ({
     id: a.id,
@@ -576,9 +576,9 @@ app.get('/api/audit', authMiddleware, async (req: Request, res: Response) => {
 });
 
 app.get('/api/subscription', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
   const { data, error } = await supabaseAdmin.from('subscription_info').select('*').eq('id', 1).single();
-  if (error || !data) return res.status(500).json({ error: 'Information non trouvée' });
+  if (error || !data) return res.status(400).json({ error: 'Information non trouvée' });
   
   const { count } = await supabaseAdmin.from('agents').select('*', { count: 'exact', head: true }).eq('status', 'ACTIVE');
   
@@ -597,7 +597,7 @@ app.get('/api/subscription', authMiddleware, async (req: Request, res: Response)
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("Unhandled error:", err);
-  res.status(500).json({ error: "Internal Server Error", details: err.message });
+  res.status(400).json({ error: "Internal Server Error", details: err.message });
 });
 
 async function startServer() {
