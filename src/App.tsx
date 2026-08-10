@@ -53,9 +53,36 @@ export default function App() {
     fetchPublicTickets();
     fetchAllAgents();
     if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.email) {
+          fetchApi('/api/agents')
+            .then(res => res.json())
+            .then((data) => {
+              const found = data.find((a: UserAgent) => a.email === session.user.email);
+              if (found) {
+                setCurrentUser(found);
+                setCurrentView('backoffice');
+              }
+            })
+            .catch(console.error);
+        }
+      });
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         if (event === "PASSWORD_RECOVERY") {
           setIsUpdatePasswordOpen(true);
+        } else if (event === "SIGNED_IN" && session?.user?.email) {
+          fetchApi('/api/agents')
+            .then(res => res.json())
+            .then((data) => {
+              const found = data.find((a: UserAgent) => a.email === session.user.email);
+              if (found) {
+                setCurrentUser(found);
+              }
+            })
+            .catch(console.error);
+        } else if (event === "SIGNED_OUT") {
+          setCurrentUser(null);
+          setCurrentView('public-home');
         }
       });
       if (window.location.hash.includes("type=recovery")) {
