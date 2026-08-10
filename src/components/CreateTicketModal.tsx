@@ -367,7 +367,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-slate-700 block mb-1">
-                    Matricule / NINEA <span className="text-rose-500">*</span>
+                    Matricule <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -381,7 +381,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
                 <div>
                   <label className="text-xs font-medium text-slate-700 block mb-1">
-                    Prénom, Nom ou Raison Sociale <span className="text-rose-500">*</span>
+                    Prénom, Nom <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"

@@ -1,3 +1,5 @@
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -267,13 +269,6 @@ async function processAttachments(ticketNumber: string, attachments: any[]) {
   for (const att of attachments) {
     if (att.url && att.url.startsWith('data:')) {
       try {
-        // Ensure bucket exists
-        const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-        const bucketExists = buckets?.find(b => b.name === 'attachments');
-        if (!bucketExists) {
-          await supabaseAdmin.storage.createBucket('attachments', { public: true });
-        }
-
         const arr = att.url.split(',');
         const mimeMatch = arr[0].match(/:(.*?);/);
         const contentType = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
@@ -371,7 +366,7 @@ app.post('/api/tickets', async (req: Request, res: Response) => {
   if (payload.email) {
     const subject = `Accusé de réception - Ticket ${newTicket.ticket_number}`;
     const bodyHtml = `<p>Bonjour ${payload.requesterName},</p><p>Votre ticket <strong>${newTicket.ticket_number}</strong> concernant "<em>${payload.objectType}</em>" a bien été pris en compte.</p><p>Notre équipe technique vous contactera dans les meilleurs délais.</p><p>Cordialement,<br>L'équipe Support DGID</p>`;
-    await sendEmailNotification(newTicket.id, newTicket.ticket_number, 'CREATION', payload.email, subject, bodyHtml, processedAttachments);
+    sendEmailNotification(newTicket.id, newTicket.ticket_number, 'CREATION', payload.email, subject, bodyHtml, processedAttachments).catch(console.error);
   }
 
   res.status(201).json({ 
@@ -425,7 +420,7 @@ app.patch('/api/tickets/:id/status', authMiddleware, async (req: Request, res: R
   if (action === 'RESOLVE' && oldTicket.email) {
     const subject = `Clôture de votre ticket - ${oldTicket.ticket_number}`;
     const bodyHtml = `<p>Bonjour ${oldTicket.requester_name},</p><p>Nous vous informons que votre ticket <strong>${oldTicket.ticket_number}</strong> a été traité et clôturé par notre équipe technique.</p><p>Commentaire de résolution : ${resolutionComment || 'Aucun commentaire'}</p><p>Cordialement,<br>L'équipe Support DGID</p>`;
-    await sendEmailNotification(oldTicket.id, oldTicket.ticket_number, 'CLOTURE', oldTicket.email, subject, bodyHtml, oldTicket.attachments || []);
+    sendEmailNotification(oldTicket.id, oldTicket.ticket_number, 'CLOTURE', oldTicket.email, subject, bodyHtml, oldTicket.attachments || []).catch(console.error);
   }
 
   res.json({ success: true });

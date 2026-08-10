@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, LogIn, LogOut, Mail, Search, Settings, Bell, Plus, FileText, AlertCircle, LayoutDashboard, CheckCircle2, UserCheck, Clock, Menu, X } from 'lucide-react';
 import { UserAgent } from '../types';
+import { fetchApi } from '../lib/api';
 
 export interface NotificationItem {
   id: string;
@@ -39,44 +40,33 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    {
-      id: '1',
-      title: 'Nouveau ticket #ST-2026-000121',
-      message: 'Soumis par le Centre de Dakar Plateau (Blocage SENTAX)',
-      time: 'Il y a 5 min',
-      isRead: false,
-      type: 'ticket',
-      ticketNumber: 'ST-2026-000121',
-    },
-    {
-      id: '2',
-      title: 'Ticket transféré #ST-2026-000123',
-      message: 'Attribué à M. Ousmane Ndiaye (Chef de Bureau DSI)',
-      time: 'Il y a 25 min',
-      isRead: false,
-      type: 'transfer',
-      ticketNumber: 'ST-2026-000123',
-    },
-    {
-      id: '3',
-      title: 'Alerte SLA Temps Réponse',
-      message: '3 tickets en attente de prise en charge depuis 24h',
-      time: 'Il y a 1h',
-      isRead: false,
-      type: 'alert',
-      ticketNumber: 'ST-2026-000121',
-    },
-    {
-      id: '4',
-      title: 'Ticket résolu #ST-2026-000122',
-      message: 'Réinitialisation mot de passe SEN-ETAFI effectuée',
-      time: 'Il y a 2h',
-      isRead: true,
-      type: 'resolve',
-      ticketNumber: 'ST-2026-000122',
-    },
-  ]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const loadPendingTickets = async () => {
+        try {
+          const res = await fetchApi('/api/tickets/private');
+          if (res.ok) {
+            const data = await res.json();
+            const pending = data.filter((t: any) => t.status === 'EN ATTENTE').slice(0, 5);
+            setNotifications(pending.map((t: any) => ({
+              id: t.id,
+              title: `Nouveau ticket #${t.ticketNumber}`,
+              message: t.objectType,
+              time: new Date(t.createdAt).toLocaleDateString(),
+              isRead: false,
+              type: 'ticket',
+              ticketNumber: t.ticketNumber,
+            })));
+          }
+        } catch (err) {
+          console.error("Failed to load notifications", err);
+        }
+      };
+      loadPendingTickets();
+    }
+  }, [user]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
