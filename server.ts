@@ -457,6 +457,16 @@ app.get('/api/agents', authMiddleware, async (req: Request, res: Response) => {
 app.post('/api/agents', authMiddleware, async (req: Request, res: Response) => {
   if (!supabaseAdmin) return res.status(500).json({ error: 'Supabase non configuré' });
   const payload = req.body;
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    email: payload.email,
+    password: 'Password123!',
+    email_confirm: true
+  });
+
+  if (authError) {
+    return res.status(400).json({ error: 'Erreur lors de la création du compte auth: ' + authError.message });
+  }
+
   
   const { data, error } = await supabaseAdmin.from('agents').insert({
     first_name: payload.firstName,

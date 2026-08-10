@@ -143,7 +143,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
       try {
         data = JSON.parse(text);
       } catch (e) {
-        if (text.includes("The page") || text.includes("413") || response.status === 413) {
+        if (response.status === 413 || text.includes("413 Payload Too Large")) {
           throw new Error("Le fichier est trop volumineux pour être envoyé.");
         }
         throw new Error("Erreur serveur: " + text.substring(0, 50));
