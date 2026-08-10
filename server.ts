@@ -1,5 +1,6 @@
+import 'express-async-errors';
 import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
+try { dns.setDefaultResultOrder("ipv4first"); } catch (e) { console.error("DNS error", e); }
 import express, { Request, Response } from 'express';
 import path from 'path';
 
@@ -63,7 +64,7 @@ app.get('/api/tickets/public', async (req: Request, res: Response) => {
   if (error) return res.status(500).json({ error: error.message });
   
   // Transform to match frontend types (camelCase)
-  const formatted = data.map((t: any) => ({
+  const formatted = (data || []).map((t: any) => ({
     id: t.id,
     ticketNumber: t.ticket_number,
     objectType: t.object_type,
@@ -87,7 +88,7 @@ app.get('/api/tickets/track/:number', async (req: Request, res: Response) => {
     
   if (error || !data) return res.status(404).json({ error: 'Ticket introuvable' });
   
-  const historyFormatted = data.ticket_history.map((h: any) => ({
+  const historyFormatted = (data.ticket_history || []).map((h: any) => ({
     id: h.id,
     ticketId: h.ticket_id,
     ticketNumber: h.ticket_number,
@@ -439,7 +440,7 @@ app.get('/api/agents', authMiddleware, async (req: Request, res: Response) => {
   const { data, error } = await supabaseAdmin.from('agents').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   
-  const formatted = data.map(a => ({
+  const formatted = (data || []).map(a => ({
     id: a.id,
     firstName: a.first_name,
     lastName: a.last_name,
@@ -511,14 +512,14 @@ app.get('/api/stats', authMiddleware, async (req: Request, res: Response) => {
   const { data, error } = await supabaseAdmin.from('tickets').select('status, platform, object_type, created_at');
   if (error) return res.status(500).json({ error: error.message });
   
-  const total = data.length;
+  const total = (data || []).length;
   const byStatus: Record<string, number> = { 'EN ATTENTE': 0, 'PRISE EN CHARGE': 0, 'TRANSFÉRÉ': 0, 'TERMINÉ': 0 };
   const byPlatform: Record<string, number> = {};
   const byType: Record<string, number> = { 'SIGNALER UN INCIDENT TECHNIQUE': 0, 'EFFECTUER UNE REQUÊTE': 0 };
   
   const monthlyData: Record<string, number> = {};
   
-  data.forEach(t => {
+  (data || []).forEach(t => {
     if (byStatus[t.status] !== undefined) byStatus[t.status]++;
     byPlatform[t.platform] = (byPlatform[t.platform] || 0) + 1;
     if (byType[t.object_type] !== undefined) byType[t.object_type]++;
@@ -542,7 +543,7 @@ app.get('/api/emails', authMiddleware, async (req: Request, res: Response) => {
   const { data, error } = await supabaseAdmin.from('email_notifications').select('*').order('sent_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   
-  const formatted = data.map(e => ({
+  const formatted = (data || []).map(e => ({
     id: e.id,
     ticketId: e.ticket_id,
     ticketNumber: e.ticket_number,
@@ -592,6 +593,11 @@ app.get('/api/subscription', authMiddleware, async (req: Request, res: Response)
     monthlyTicketsCount: 0,
     maxTicketsPerMonth: data.max_tickets_per_month
   });
+});
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
 
 async function startServer() {
