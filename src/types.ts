@@ -61,7 +61,6 @@ export interface Ticket {
   position: string; // Poste occupé
   phone: string;
   email: string;
-  habilitation: HabilitationType;
   bureau: string;
   centreFiscal: string;
   description?: string;

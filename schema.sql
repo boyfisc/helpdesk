@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS tickets (
   position TEXT,
   phone TEXT,
   email TEXT,
-  habilitation TEXT,
   bureau TEXT,
   centre_fiscal TEXT,
   description TEXT,
