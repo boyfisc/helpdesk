@@ -150,10 +150,6 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                 <strong className="text-slate-900">{ticket.position}</strong>
               </div>
               <div>
-                <span className="text-slate-500 block">Habilitation :</span>
-                <strong className="text-slate-900">{ticket.habilitation}</strong>
-              </div>
-              <div>
                 <span className="text-slate-500 block">Téléphone :</span>
                 <strong className="text-slate-900 font-mono">{ticket.phone}</strong>
               </div>

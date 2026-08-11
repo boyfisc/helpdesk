@@ -42,7 +42,6 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
 
-  const [habilitation, setHabilitation] = useState<HabilitationType>('Agent d\'Assiette');
   const [bureau, setBureau] = useState('');
   const [centreFiscal, setCentreFiscal] = useState(TAX_CENTERS[0]);
   const [description, setDescription] = useState('');
@@ -130,7 +129,6 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
           position,
           phone,
           email,
-          habilitation,
           bureau,
           centreFiscal,
           description,
@@ -446,28 +444,11 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               </div>
             </div>
 
-            {/* SECTION 4, 5, 6 — Habilitation, Bureau, Centre Fiscal */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* SECTION 4, 5 — Bureau, Centre Fiscal */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
-                  4. Habilitation <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  value={habilitation}
-                  onChange={(e) => setHabilitation(e.target.value as HabilitationType)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
-                >
-                  {HABILITATIONS.map((hab) => (
-                    <option key={hab} value={hab}>
-                      {hab}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
-                  5. Bureau <span className="text-rose-500">*</span>
+                  4. Bureau <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -481,7 +462,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
               <div>
                 <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
-                  6. Centre Fiscal <span className="text-rose-500">*</span>
+                  5. Centre Fiscal <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={centreFiscal}
@@ -497,10 +478,10 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               </div>
             </div>
 
-            {/* SECTION 7 — Description & Attachments */}
+            {/* SECTION 6 — Description & Attachments */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center justify-between">
-                <span>7. Précisions de votre requête / Description</span>
+                <span>6. Précisions de votre requête / Description</span>
                 <span className="text-[11px] font-normal text-slate-400">Facultatif</span>
               </label>
               <textarea
