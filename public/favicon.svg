@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="401" height="275" viewBox="0 0 401 275">
+
+  <!-- Fond blanc -->
+  <rect width="401" height="275" fill="white"/>
+
+  <!-- Arceau vert -->
+  <path
+    d="M321 103
+       C310 57 271 31 211 31
+       C149 31 108 61 102 113
+       L102 176
+       C107 216 138 246 188 258"
+    fill="none"
+    stroke="#00B84F"
+    stroke-width="17"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Écouteur gauche -->
+  <rect
+    x="88"
+    y="111"
+    width="28"
+    height="75"
+    rx="5"
+    fill="#00B84F"/>
+
+  <!-- Écouteur droit -->
+  <rect
+    x="300"
+    y="101"
+    width="33"
+    height="53"
+    rx="4"
+    fill="#414141"/>
+
+  <!-- Partie basse -->
+  <rect
+    x="184"
+    y="234"
+    width="54"
+    height="34"
+    rx="4"
+    fill="#414141"/>
+
+  <!-- Œil gauche -->
+  <circle
+    cx="174"
+    cy="136"
+    r="17"
+    fill="#414141"/>
+
+  <circle
+    cx="174"
+    cy="136"
+    r="7"
+    fill="#B9B0FF"/>
+
+  <!-- Œil droit -->
+  <circle
+    cx="258"
+    cy="136"
+    r="17"
+    fill="#414141"/>
+
+  <circle
+    cx="258"
+    cy="136"
+    r="7"
+    fill="#B9B0FF"/>
+
+  <!-- Sourire -->
+  <path
+    d="M197 185
+       C209 198 226 199 241 185"
+    fill="none"
+    stroke="#414141"
+    stroke-width="3"
+    stroke-linecap="round"/>
+
+</svg>
