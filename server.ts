@@ -267,8 +267,27 @@ async function sendEmailNotification(ticketId: string, ticketNumber: string, typ
   }
 }
 
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+];
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+
+function validateFileSignature(buffer: Buffer, declaredMimeType: string): boolean {
+  const hex = buffer.toString('hex', 0, 8).toUpperCase();
+  if (declaredMimeType === 'image/jpeg') return hex.startsWith('FFD8FF');
+  if (declaredMimeType === 'image/png') return hex.startsWith('89504E47');
+  if (declaredMimeType === 'application/pdf') return hex.startsWith('25504446');
+  if (declaredMimeType === 'application/msword') return hex.startsWith('D0CF11E0');
+  if (declaredMimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return hex.startsWith('504B0304');
+  return false;
+}
+
 async function processAttachments(ticketNumber: string, attachments: any[]) {
-  if (!supabaseAdmin || !attachments || attachments.length === 0) return attachments;
+  if (!supabaseAdmin || !attachments || attachments.length === 0) return [];
   
   const processedAttachments = [];
   
@@ -278,9 +297,35 @@ async function processAttachments(ticketNumber: string, attachments: any[]) {
         const arr = att.url.split(',');
         const mimeMatch = arr[0].match(/:(.*?);/);
         const contentType = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+        
+        // 1. Validation de la liste blanche des types MIME
+        if (!ALLOWED_MIME_TYPES.includes(contentType)) {
+          console.warn(`[SECURITE] Type de fichier non autorisé détecté et bloqué : ${contentType}`);
+          continue; // Ignorer le fichier malveillant
+        }
+
         const bstr = Buffer.from(arr[1], 'base64');
         
-        const ext = att.name.split('.').pop() || 'file';
+        // 2. Validation stricte de la taille (max 2 Mo)
+        if (bstr.length > MAX_FILE_SIZE) {
+          console.warn(`[SECURITE] Fichier trop volumineux bloqué (> 2Mo) : ${att.name}`);
+          continue;
+        }
+
+        // 3. Validation de la signature du fichier (Magic Numbers)
+        if (!validateFileSignature(bstr, contentType)) {
+          console.warn(`[SECURITE] Signature de fichier invalide détectée (tentative d'usurpation) : ${att.name}`);
+          continue;
+        }
+        
+        // 4. Renommage sécurisé et forcé de l'extension
+        let ext = 'bin';
+        if (contentType === 'image/jpeg') ext = 'jpg';
+        if (contentType === 'image/png') ext = 'png';
+        if (contentType === 'application/pdf') ext = 'pdf';
+        if (contentType === 'application/msword') ext = 'doc';
+        if (contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ext = 'docx';
+
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
         const filePath = `${ticketNumber}/${fileName}`;
         
@@ -293,22 +338,18 @@ async function processAttachments(ticketNumber: string, attachments: any[]) {
           
         if (error) {
           console.error('Error uploading attachment to Supabase Storage:', error);
-          processedAttachments.push(att);
         } else {
           const { data: { publicUrl } } = supabaseAdmin.storage.from('attachments').getPublicUrl(filePath);
           processedAttachments.push({
             name: att.name,
             size: att.size,
-            type: att.type,
+            type: contentType,
             url: publicUrl
           });
         }
       } catch (err) {
         console.error('Failed to process attachment:', err);
-        processedAttachments.push(att);
       }
-    } else {
-      processedAttachments.push(att);
     }
   }
   
