@@ -353,7 +353,8 @@ app.post('/api/tickets', async (req: Request, res: Response) => {
     centre_fiscal: payload.centreFiscal,
     description: payload.description,
     attachments: processedAttachments,
-    status: 'EN ATTENTE'
+    status: 'EN ATTENTE',
+    habilitation: payload.habilitation || 'Non définie'
   }).select().single();
   
   if (error) return res.status(400).json({ error: error.message });
