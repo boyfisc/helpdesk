@@ -1,6 +1,14 @@
 import 'express-async-errors';
 import dns from "dns";
 try { dns.setDefaultResultOrder("ipv4first"); } catch (e) { console.error("DNS error", e); }
+
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
+
 import express, { Request, Response } from 'express';
 import path from 'path';
 
@@ -209,13 +217,17 @@ app.get('/api/tickets/:id', authMiddleware, async (req: Request, res: Response) 
 
 async function logAudit(action: string, details: string, email: string = 'dsi.dgid@gmail.com', name: string = 'Système', role: string = 'SYSTEM') {
   if (!supabaseAdmin) return;
-  await supabaseAdmin.from('audit_logs').insert({
-    user_email: email,
-    user_name: name,
-    user_role: role,
-    action: action,
-    details: details
-  });
+  try {
+    await supabaseAdmin.from('audit_logs').insert({
+      user_email: email,
+      user_name: name,
+      user_role: role,
+      action: action,
+      details: details
+    });
+  } catch (err) {
+    console.error('Audit log failed:', err);
+  }
 }
 
 async function sendEmailNotification(ticketId: string, ticketNumber: string, type: string, recipient: string, subject: string, bodyHtml: string, attachments: any[] = []) {
@@ -497,8 +509,16 @@ app.get('/api/agents', authMiddleware, async (req: Request, res: Response) => {
 });
 
 app.post('/api/agents', authMiddleware, async (req: Request, res: Response) => {
-  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
+  console.log('[Server] POST /api/agents triggered with payload:', req.body);
+  if (!supabaseAdmin) {
+    console.error('[Server] Supabase admin not configured');
+    return res.status(400).json({ error: 'Supabase non configuré' });
+  }
   const payload = req.body;
+  
+  let authUserId = null;
+
+  console.log('[Server] Attempting to create auth user for:', payload.email);
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email: payload.email,
     password: 'Password123!',
@@ -506,11 +526,35 @@ app.post('/api/agents', authMiddleware, async (req: Request, res: Response) => {
   });
 
   if (authError) {
-    return res.status(400).json({ error: 'Erreur lors de la création du compte auth: ' + authError.message });
-  }
+    console.error('[Server] Auth user creation failed:', authError.message);
+    if (authError.message && authError.message.includes('already been registered')) {
+      console.log('[Server] User already exists in Auth. Retrieving ID...');
+      const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError || !listData) {
+        return res.status(500).json({ error: 'Erreur lors de la récupération de l\'utilisateur existant.' });
+      }
+      const existingUser = listData.users.find(u => u.email === payload.email);
+      if (!existingUser) {
+        return res.status(500).json({ error: 'Utilisateur orphelin non trouvé.' });
+      }
+      authUserId = existingUser.id;
 
+      console.log('[Server] Checking agents table for:', authUserId);
+      const { data: existingAgent } = await supabaseAdmin.from('agents').select('id').eq('email', payload.email).single();
+      if (existingAgent) {
+        return res.status(400).json({ error: 'Un agent avec cette adresse email existe déjà.' });
+      }
+      console.log('[Server] Auth user exists but orphaned. Proceeding to create agent record...');
+    } else {
+      return res.status(400).json({ error: 'Erreur lors de la création du compte auth: ' + (authError.message || 'Erreur inconnue') });
+    }
+  } else {
+    authUserId = authData.user.id;
+  }
   
+  console.log('[Server] Inserting into agents table with ID:', authUserId);
   const { data, error } = await supabaseAdmin.from('agents').insert({
+    id: authUserId,
     first_name: payload.firstName,
     last_name: payload.lastName,
     email: payload.email,
@@ -524,7 +568,13 @@ app.post('/api/agents', authMiddleware, async (req: Request, res: Response) => {
     status: payload.status || 'ACTIVE'
   }).select().single();
   
-  if (error) return res.status(400).json({ error: error.message });
+  if (error) {
+    console.error('[Server] Failed to insert agent record:', error.message);
+    // Note: To be robust, we might want to delete the created auth user here, but we'll stick to logging for now.
+    return res.status(400).json({ error: error.message });
+  }
+
+  console.log('[Server] Agent record inserted successfully. Logging audit...');
   await logAudit('CREATION_AGENT', `Agent ${payload.email} créé`);
   res.status(201).json(data);
 });

@@ -1,0 +1,27 @@
+--- server.ts
++++ server.ts
+@@ -235,13 +235,17 @@
+ });
+ 
+ async function logAudit(action: string, details: string, email: string = 'dsi.dgid@gmail.com', name: string = 'Système', role: string = 'SYSTEM') {
+-  if (!supabaseAdmin) return;
+-  await supabaseAdmin.from('audit_logs').insert({
+-    user_email: email,
+-    user_name: name,
+-    user_role: role,
+-    action: action,
+-    details: details
+-  });
++  try {
++    if (!supabaseAdmin) return;
++    await supabaseAdmin.from('audit_logs').insert({
++      user_email: email,
++      user_name: name,
++      user_role: role,
++      action: action,
++      details: details
++    });
++  } catch (e) {
++    console.error('Audit log failed:', e);
++  }
+ }

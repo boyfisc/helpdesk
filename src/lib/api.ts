@@ -15,13 +15,24 @@ export const fetchApi = async (url: string, options: RequestInit = {}) => {
       console.warn('Supabase auth getSession failed:', e);
     }
   }
-  const res = await fetch(url, options);
+  let res;
+  try {
+    res = await fetch(url, options);
+  } catch (err: any) {
+    console.error('Fetch network error:', err);
+    throw new Error('Erreur de connexion (Failed to fetch). Le serveur est peut-être en cours de redémarrage.');
+  }
+
   if (!res.ok) {
-    let errorMsg = 'Failed to fetch';
+    let errorMsg = 'Erreur inattendue';
     try {
-      const errData = await res.json();
+      const textData = await res.text();
+      console.error('API Error Response Text:', textData);
+      const errData = JSON.parse(textData);
       if (errData.error) errorMsg = errData.error;
-    } catch(e) {}
+    } catch(e) {
+      errorMsg = `Erreur serveur (${res.status})`;
+    }
     throw new Error(errorMsg);
   }
   return res;

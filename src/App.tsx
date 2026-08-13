@@ -231,22 +231,28 @@ export default function App() {
   };
 
   const handleAddAgent = async (newAgentData: Partial<UserAgent>): Promise<{success: boolean, error?: string}> => {
+    console.log('[App] handleAddAgent triggered with data:', newAgentData);
     try {
+      console.log('[App] Sending POST request to /api/agents...');
       const res = await fetchApi('/api/agents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAgentData),
       });
 
+      console.log(`[App] API Response status: ${res.status} ${res.statusText}`);
+
       if (res.ok) {
+        console.log('[App] Agent creation successful, refreshing agents list.');
         fetchAllAgents();
         return { success: true };
       } else {
         const errorData = await res.json();
+        console.error('[App] API Error payload:', errorData);
         return { success: false, error: errorData.error || 'Erreur du serveur' };
       }
     } catch (e: any) {
-      console.warn(e);
+      console.error('[App] Exception in handleAddAgent:', e);
       return { success: false, error: e.message || 'Erreur réseau' };
     }
   };

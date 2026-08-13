@@ -1,0 +1,21 @@
+--- server.ts
++++ server.ts
+@@ -512,8 +512,17 @@
+   });
+ 
+   if (authError) {
+     console.error('[Server] Auth user creation failed:', authError.message);
+-    return res.status(400).json({ error: 'Erreur lors de la création du compte auth: ' + authError.message });
++    if (authError.message.includes('already been registered')) {
++      console.log('[Server] User already exists in Auth. Checking agents table...');
++      const { data: existingAgent } = await supabaseAdmin.from('agents').select('id').eq('email', payload.email).single();
++      if (existingAgent) {
++         return res.status(400).json({ error: 'Un agent avec cette adresse email existe déjà.' });
++      }
++      console.log('[Server] Auth user exists but orphaned. Proceeding to create agent record...');
++    } else {
++      return res.status(400).json({ error: 'Erreur lors de la création du compte auth: ' + authError.message });
++    }
+   }
+   
+   console.log('[Server] Auth user created successfully, inserting into agents table...');

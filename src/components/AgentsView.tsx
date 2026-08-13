@@ -25,35 +25,58 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onAddAgent, onUp
 
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[AgentsView] Starting form submission with:', { firstName, lastName, email, phone, matricule, role, habilitation });
+
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      setError('Veuillez remplir le prénom, nom et email.');
+      const msg = 'Veuillez remplir le prénom, nom et email.';
+      console.warn(`[AgentsView] Validation failed: ${msg}`);
+      setError(msg);
       return;
     }
 
-    const res = await onAddAgent({
-      firstName,
-      lastName,
-      email,
-      phone,
-      matricule,
-      role,
-      habilitation,
-      poste,
-      bureau,
-      direction,
-      status: 'ACTIVE',
-    });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      const msg = 'Veuillez fournir une adresse email valide.';
+      console.warn(`[AgentsView] Validation failed: ${msg}`);
+      setError(msg);
+      return;
+    }
 
-    if (res.success) {
-      setIsAdding(false);
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setPhone('');
-      setMatricule('');
-      setError('');
-    } else {
-      setError(res.error || "Une erreur s'est produite lors de la création.");
+    console.log('[AgentsView] Validation passed, calling onAddAgent...');
+    try {
+      const res = await onAddAgent({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        matricule: matricule.trim(),
+        role,
+        habilitation,
+        poste,
+        bureau,
+        direction,
+        status: 'ACTIVE',
+      });
+      
+      console.log('[AgentsView] onAddAgent response:', res);
+
+      if (res.success) {
+        console.log('[AgentsView] Agent added successfully. Resetting form.');
+        setIsAdding(false);
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setPhone('');
+        setMatricule('');
+        setError('');
+      } else {
+        const errorMsg = res.error || "Une erreur s'est produite lors de la création.";
+        console.error('[AgentsView] Error from server:', errorMsg);
+        setError(errorMsg);
+      }
+    } catch (err: any) {
+      console.error('[AgentsView] Unhandled exception during submission:', err);
+      setError("Une erreur inattendue est survenue.");
     }
   };
 
