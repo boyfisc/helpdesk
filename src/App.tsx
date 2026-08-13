@@ -230,7 +230,7 @@ export default function App() {
     }
   };
 
-  const handleAddAgent = async (newAgentData: Partial<UserAgent>) => {
+  const handleAddAgent = async (newAgentData: Partial<UserAgent>): Promise<{success: boolean, error?: string}> => {
     try {
       const res = await fetchApi('/api/agents', {
         method: 'POST',
@@ -240,10 +240,14 @@ export default function App() {
 
       if (res.ok) {
         fetchAllAgents();
-
+        return { success: true };
+      } else {
+        const errorData = await res.json();
+        return { success: false, error: errorData.error || 'Erreur du serveur' };
       }
-    } catch (e) {
+    } catch (e: any) {
       console.warn(e);
+      return { success: false, error: e.message || 'Erreur réseau' };
     }
   };
 

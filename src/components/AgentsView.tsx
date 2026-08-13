@@ -5,7 +5,7 @@ import { HabilitationType, UserAgent, UserRole } from '../types';
 
 interface AgentsViewProps {
   agents: UserAgent[];
-  onAddAgent: (newAgent: Partial<UserAgent>) => void;
+  onAddAgent: (newAgent: Partial<UserAgent>) => Promise<{success: boolean, error?: string}>;
   onUpdateAgent: (id: string, data: Partial<UserAgent>) => void;
 }
 
@@ -23,14 +23,14 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onAddAgent, onUp
   const [direction, setDirection] = useState('Direction des Systèmes d\'Information');
   const [error, setError] = useState('');
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       setError('Veuillez remplir le prénom, nom et email.');
       return;
     }
 
-    onAddAgent({
+    const res = await onAddAgent({
       firstName,
       lastName,
       email,
@@ -44,12 +44,17 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onAddAgent, onUp
       status: 'ACTIVE',
     });
 
-    setIsAdding(false);
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setPhone('');
-    setMatricule('');
+    if (res.success) {
+      setIsAdding(false);
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPhone('');
+      setMatricule('');
+      setError('');
+    } else {
+      setError(res.error || "Une erreur s'est produite lors de la création.");
+    }
   };
 
   return (
