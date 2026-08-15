@@ -48,6 +48,7 @@ export interface TicketAttachment {
   size: string;
   type: string;
   url?: string;
+  path?: string;
 }
 
 export interface Ticket {

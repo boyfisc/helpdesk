@@ -24,11 +24,14 @@ app.use(express.json({ limit: '50mb' }));
 
 let transporter: nodemailer.Transporter | null = null;
 function getTransporter() {
-  if (!transporter && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_PASS !== 'YOUR_GMAIL_APP_PASSWORD') {
+  if (!transporter && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465;
+    
     transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465, // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -59,6 +62,55 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
 };
 
 // Health check
+app.get('/api/attachments/sign', authMiddleware, async (req: Request, res: Response) => {
+  if (!supabaseAdmin) return res.status(400).json({ error: 'Supabase non configuré' });
+  const filePath = req.query.path as string;
+  if (!filePath) return res.status(400).json({ error: 'Chemin manquant' });
+
+  const { data, error } = await supabaseAdmin.storage.from('attachments').createSignedUrl(filePath, 60);
+  if (error || !data) {
+    console.error('[Server] Signed URL error:', error);
+    return res.status(404).json({ error: 'Pièce jointe introuvable' });
+  }
+
+  res.json({ signedUrl: data.signedUrl });
+});
+
+app.get('/api/admin/test-smtp', async (req: Request, res: Response) => {
+  const mailer = getTransporter();
+  if (!mailer) {
+    return res.status(400).json({ 
+      status: 'error', 
+      message: 'Variables d\'environnement SMTP manquantes.' 
+    });
+  }
+  try {
+    await mailer.verify();
+    
+    // Attempt to send a real test email
+    const testRecipient = req.query.to as string || process.env.SMTP_USER;
+    
+    const info = await mailer.sendMail({
+      from: `"Support DGID" <${process.env.SMTP_USER}>`,
+      to: testRecipient,
+      subject: "Test de configuration SMTP DGID",
+      html: "<p>Félicitations, l'envoi d'e-mails depuis votre domaine fonctionne parfaitement !</p>"
+    });
+
+    res.json({ 
+      status: 'success', 
+      message: 'Connexion SMTP réussie et e-mail envoyé !', 
+      detail: info 
+    });
+  } catch (error: any) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Erreur lors de l\'envoi SMTP', 
+      detail: error.message 
+    });
+  }
+});
+
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'SENTAX DGID Support API', version: '2.0.0' });
 });
@@ -356,7 +408,8 @@ async function processAttachments(ticketNumber: string, attachments: any[]) {
             name: att.name,
             size: att.size,
             type: contentType,
-            url: publicUrl
+            url: publicUrl,
+            path: filePath
           });
         }
       } catch (err) {

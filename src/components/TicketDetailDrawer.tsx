@@ -35,6 +35,25 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
   const [history, setHistory] = useState<TicketHistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
+  const handleViewAttachment = async (att: any) => {
+    if (att.path) {
+      try {
+        const res = await fetchApi(`/api/attachments/sign?path=${encodeURIComponent(att.path)}`);
+        const data = await res.json();
+        if (data.signedUrl) {
+           window.open(data.signedUrl, '_blank');
+        } else {
+           alert("Impossible d'obtenir le lien sécurisé.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Erreur lors de l'ouverture de la pièce jointe");
+      }
+    } else if (att.url) {
+      window.open(att.url, '_blank');
+    }
+  };
+
   useEffect(() => {
     if (ticket) {
       fetchTicketHistory();
@@ -185,16 +204,13 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                   <div key={idx} className="flex items-center space-x-2 bg-slate-100 p-2 rounded border border-slate-200 text-xs font-mono">
                     <Paperclip className="w-3.5 h-3.5 text-slate-500" />
                     <span>{att.name} ({att.size})</span>
-                    {att.url && (
-                      <a 
-                        href={att.url} 
-                        download={att.name}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="ml-auto text-emerald-600 hover:text-emerald-800 text-[11px] font-bold underline"
+                    {(att.url || att.path) && (
+                      <button 
+                        onClick={() => handleViewAttachment(att)}
+                        className="ml-auto text-emerald-600 hover:text-emerald-800 text-[11px] font-bold underline cursor-pointer"
                       >
                         Consulter
-                      </a>
+                      </button>
                     )}
                   </div>
                 ))}
